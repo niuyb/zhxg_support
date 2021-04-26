@@ -1,0 +1,353 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block css_tail %}
+<!-- jqgrid-->
+<link href="{% static 'css/plugins/jqgrid/ui.jqgrid.css' %}" rel="stylesheet">
+<link href="{% static 'css/plugins/datapicker/datepicker3.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<script>
+
+</script>
+<div style="display: none;">
+    <div id="department-api">{{ departments_api }}</div>
+    <div id="department-data">{{ department_data }}</div>
+    <div id="department-data-1">{{ department_data_1 }}</div>
+    <div id="industry-data">{{ industry_data }}</div>
+    <div id="activity-api">{% url 'customer:activity_api' %}</div>
+    <div id="cities-api">{% url 'customer:cities_api' %}</div>
+    <div id="counties-api">{% url 'customer:counties_api' %}</div>
+    <div id="fields-to-check">{{ fields_to_check }}</div>
+    <div id="msuser-jump-url">{{ msuser_jump_url }}</div>
+    <div id="tsgz-user-jump-url">{{ tsgz_user_jump_url }}</div>
+    <div id="wp-user-jump-url">{{ wp_user_jump_url }}</div>
+    <div id="crmuser-jump-url">{{ crmuser_jump_url }}</div>
+    <div id="yqms-account-jump-url">{{ yqms_account_jump_url }}</div>
+    <div id="tsgz-account-jump-url">{{ tsgz_account_jump_url }}</div>
+    <div id="wp-account-jump-url">{{ wp_account_jump_url }}</div>
+    <div id="crm-customer-jump-url">{{ crm_customer_jump_url }}</div>
+    <div id="user-log-url">{{ user_log_url }}</div>
+    <div id="wp-account-url">{% url 'customer:get_wp_account_ajax' %}</div>
+    <div id="activity-export-file">{% url 'customer:activity_export_file' %}</div>
+</div>
+<div class="row">
+    <div class="col-sm-12">
+        <div style="margin-top: 10px;"></div>
+        <div class="ibox float-e-margins" style="margin-bottom: 10px;">
+            <!-- <div style="margin-top: 5px;"></div> -->
+            <!-- <div class="ibox-title">
+                <h5>客户活跃度统计</h5>
+                <div class="ibox-tools"></div>
+            </div> -->
+            <div class="ibox-content">
+                <form method="GET" onsubmit="return false;" class="form-horizontal" id="activity-filter-form">
+                    <!-- {% csrf_token %} -->
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <div class="col-lg-1 col-md-2 col-sm-3" style="margin-top: 5px; padding-left: 1px; padding-right: 1px;">
+                                <label><nobr>产品类别：</nobr></label>
+                                <!-- <select type="text" class="form-control" name="account_status"></select> -->
+                                {{ form.product_type }}
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-6" style="margin-top: 5px; padding-left: 1px; padding-right: 1px;">
+                                <label><nobr>账号名称：</nobr></label>
+                                <input type="text" class="form-control" placeholder="模糊查询"  name="account_name"/>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-3" style="margin-top: 5px; padding-left: 1px; padding-right: 1px;">
+                                <label>
+                                    <nobr style=" margin-left: -10px;">
+                                        账号状态:
+                                        <input type="checkbox" value="1" 
+                                            title="默认按账号当前状态进行查询，勾选此项后，将按账号的历史状态进行查询"
+                                            name="account_status_history" 
+                                            {% if form.account_status_history.value %} checked="checked" {% endif %}
+                                            id="id_account_status_history" 
+                                            style="margin: 0; margin-bottom: 0;" 
+                                        />
+                                        <span style="color: red;"
+                                            title="默认按账号当前状态进行查询，勾选此项后，将按账号的历史状态进行查询">
+                                            历史
+                                        </span>
+                                    </nobr>
+                                </label>
+                                <!-- <select type="text" class="form-control" name="account_status"></select> -->
+                                {{ form.account_status }}
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-md-4 col-sm-6" id="data_4" style="margin-top: 5px; padding-left: 1px; padding-right: 1px;">
+                                <label><nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;账号注册日期：</nobr></label>
+                                <div class="input-daterange input-group" id="datepicker4">
+                                    <input type="text" class="input-sm form-control" name="ctime_start" placeholder="----------" style="width: 110%;"
+                                            value="{% if form.ctime_start.value %}{{ form.ctime_start.value }}{% else %}{{ form.ctime_start.field.value }}{% endif %}" />
+                                    <span class="input-group-addon" style="width: 10%;">&nbsp;&nbsp;&nbsp;&nbsp;至</span>
+                                    <input type="text" class="input-sm form-control" name="ctime_finish" placeholder="----------" style="width: 100%;"
+                                            value="{% if form.ctime_finish.value %}{{ form.ctime_finish.value }}{% else %}{{ form.ctime_finish.field.value }}{% endif %}" />
+                                </div>
+                            </div>
+                            <div class="col-lg-1 col-md-2 col-sm-6" style="margin-top: 5px; padding-left: 1px; padding-right: 1px;" 
+                                    title="请输入大于等于{{ login_days_min }}，小于等于{{ login_days_max }}" id="id_login_days">
+                                <label><nobr>登录天数：</nobr></label>
+                                <input type="number" id="login-days-input" class="form-control" 
+                                        value="{% if form.login_days.value %}{{ form.login_days.value }}{% else %}{{ form.login_days.field.value }}{% endif %}" 
+                                        min="{{ form.login_days.field.min }}" max="{{ form.login_days.field.max }}" name="login_days" />
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-6" style="margin-top: 5px; padding-left: 1px; padding-right: 1px;">
+                                <span style="font-weight: bold;">
+                                    <nobr>
+                                        商务:
+                                        <input type="checkbox" value="1" 
+                                            title="是否属于商机团队成员"
+                                            name="team" 
+                                            {% if form.team.value %} checked="checked" {% endif %}
+                                            id="id_team" 
+                                            style="margin: 0; margin-bottom: 0;" 
+                                        />
+                                        <label style="color: red;" for="id_team"
+                                            title="是否属于商机团队成员">
+                                            成员
+                                        </label>
+                                        <input type="checkbox" value="1" 
+                                            title="是否属于账号维护人员"
+                                            name="maint" 
+                                            {% if form.maint.value %} checked="checked" {% endif %}
+                                            id="id_maint" 
+                                            style="margin: 0; margin-bottom: 0;" 
+                                        />
+                                        <label style="color: red;" for="id_maint"
+                                            title="是否属于账号维护人员">
+                                            维护
+                                        </label>
+                                    </nobr>
+                                </span>
+                                <input type="text"  class="form-control" placeholder="模糊查询" name="saler" />
+                            </div>
+                            <div class="col-lg-3 col-md-4 col-sm-6" id="data_5" style="margin-top: 5px; padding-left: 1px; padding-right: 1px;">
+                                <label>
+                                    <nobr>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;结单日期：
+                                        <input type="checkbox" value="1" name="no_quzong_ok"  
+                                            title="勾选后，此筛选项将设置为空"
+                                            {% if form.no_quzong_ok.value %} checked="checked" {% endif %}
+                                            id="id_no_quzong_ok" style="margin: 0; margin-bottom: 0;" 
+                                        />
+                                        <span title="勾选后，此筛选项将设置为空" style="color: red;">
+                                            无
+                                        </span>
+                                    </nobr>
+                                </label>
+                                <div class="input-daterange input-group" id="datepicker5">
+                                    <input type="text" class="input-sm form-control" name="quzong_ok_start" placeholder="----------" style="width: 110%;"
+                                            value="{% if form.quzong_ok_start.value %}{{ form.quzong_ok_start.value }}{% else %}{{ form.quzong_ok_start.field.value }}{% endif %}" />
+                                    <span class="input-group-addon" style="width: 10%;">&nbsp;&nbsp;&nbsp;&nbsp;至</span>
+                                    <input type="text" class="input-sm form-control" name="quzong_ok_finish" placeholder="----------" style="width: 100%;"
+                                            value="{% if form.quzong_ok_finish.value %}{{ form.quzong_ok_finish.value }}{% else %}{{ form.quzong_ok_finish.field.value }}{% endif %}" />
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-4 col-sm-6" id="data_6" style="margin-top: 5px; padding-left: 1px; padding-right: 1px;">
+                                <label><nobr>活跃日期：</nobr></label>
+                                <div class="input-daterange input-group" id="datepicker6">
+                                    <input type="text" class="input-sm form-control" name="activity_start" style="width: 110%;"
+                                            value="{% if form.activity_start.value %}{{ form.activity_start.value }}{% else %}{{ form.activity_start.field.value }}{% endif %}" />
+                                    <span class="input-group-addon" style="width: 10%;">&nbsp;&nbsp;&nbsp;&nbsp;至</span>
+                                    <input type="text" class="input-sm form-control" name="activity_finish" style="width: 100%;"
+                                            value="{% if form.activity_finish.value %}{{ form.activity_finish.value }}{% else %}{{ form.activity_finish.field.value }}{% endif %}" />
+                                </div>
+                            </div>
+                        <!-- </div>
+                        <div class="col-sm-12"> -->
+                            <div class="col-lg-1 col-md-2 col-sm-6" style="margin-top: 5px; padding-left: 1px; padding-right: 1px;">
+                                <label><nobr>客户名称：</nobr></label>
+                                <input type="text" class="form-control" placeholder="模糊查询" name="customer_name">
+                            </div>
+                            <div class="col-lg-1 col-md-2 col-sm-3" style="margin-top: 5px; padding-left: 1px; padding-right: 1px;" id="id_province">
+                                <!-- <label>客户地域-省：</label> -->
+                                <label><nobr>客户地域：</nobr></label>
+                                <!-- <select type="text" class="form-control" name="customer_province"></select> -->
+                                {{ form.customer_province }}
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-3" style="margin-top: 5px; display: none; padding-left: 1px; padding-right: 1px;" id="id_city">
+                                <label><nobr>客户地域-市：</nobr></label>
+                                <!-- <select type="text" class="form-control" name="customer_city"></select> -->
+                                {{ form.customer_city }}
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-3" style="margin-top: 5px; display: none; padding-left: 1px; padding-right: 1px;" id="id_county">
+                                <label><nobr>客户地域-县：</nobr></label>
+                                <!-- <select type="text" class="form-control" name="customer_county"></select> -->
+                                {{ form.customer_county }}
+                            </div>
+                            <div class="col-lg-1 col-md-2 col-sm-3" style="margin-top: 5px; display: none; padding-left: 1px; padding-right: 1px;">
+                                <input name="department" id="department-value" />
+                            </div>
+                            <div class="col-lg-1 col-md-2 col-sm-3" id="id_industry-1" style="margin-top: 5px; padding-left: 1px; padding-right: 1px;">
+                                <label><nobr>一级行业：</nobr></label>
+                                <select type="text" class="form-control" name="industry_l1" id="industry-1" onchange="onIndustryChange1()" style="padding-top: 2px;">
+                                    {% for option in form.industry_l1 %}
+                                        {{ option }}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-lg-1 col-md-2 col-sm-3" id="id_industry-2" style="margin-top: 5px; display: none; padding-left: 1px; padding-right: 1px;">
+                                <label><nobr>二级行业:</nobr></label>
+                                <select type="text" class="form-control" name="industry_l2" id="industry-2" style="padding-top: 2px;"></select>
+                            </div>
+                            <div class="col-lg-1 col-md-2 col-sm-3" id="id_department-1" style="margin-top: 5px; padding-left: 1px; padding-right: 1px;">
+                                <label><nobr>部门：</nobr></label>
+                                <select type="text" class="form-control" id="department-1" onchange="onDepartmentChange1()" style="padding-top: 2px;"></select>
+                            </div>
+                            <div class="col-lg-1 col-md-2 col-sm-3" id="id_department-2" style="margin-top: 5px; display: none; padding-left: 1px; padding-right: 1px;">
+                                <label><nobr>二级部门:</nobr></label>
+                                <select type="text" class="form-control" id="department-2" onchange="onDepartmentChange2()" style="padding-top: 2px;"></select>
+                            </div>
+                            <div class="col-lg-1 col-md-2 col-sm-3" id="id_department-3" style="margin-top: 5px; display: none; padding-left: 1px; padding-right: 1px;">
+                                <label><nobr>三级部门:</nobr></label>
+                                <select type="text" class="form-control" id="department-3" onchange="onDepartmentChange3()" style="padding-top: 2px;"></select>
+                            </div>
+                            <div class="col-lg-1 col-md-2 col-sm-3" id="id_department-4" style="margin-top: 5px; display: none; padding-left: 1px; padding-right: 1px;">
+                                <label><nobr>四级部门:</nobr></label>
+                                <select type="text" class="form-control" id="department-4" onchange="onDepartmentChange4()" style="padding-top: 2px;"></select>
+                            </div>
+                            <div class="col-lg-1 col-md-2 col-sm-3" id="id_department-5" style="margin-top: 5px; display: none; padding-left: 1px; padding-right: 1px;">
+                                <label><nobr>五级部门:</nobr></label>
+                                <select type="text" class="form-control" id="department-5" onchange="onDepartmentChange5()" style="padding-top: 2px;"></select>
+                            </div>
+                            <div class="col-lg-1 col-md-2 col-sm-3" id="id_department-6" style="margin-top: 5px; display: none; padding-left: 1px; padding-right: 1px;">
+                                <label><nobr>六级部门:</nobr></label>
+                                <select type="text" class="form-control" id="department-6" onchange="onDepartmentChange6()"></select>
+                            </div>
+                            <div class="col-md-1 col-sm-2" id="id_department-7" style="margin-top: 5px; display: none; padding-left: 1px; padding-right: 1px;">
+                                <label><nobr>七级部门:</nobr></label>
+                                <select type="text" class="form-control" id="department-7" onchange="onDepartmentChange7()"></select>
+                            </div>
+                            <div class="col-md-1 col-sm-2" id="id_department-8" style="margin-top: 5px; display: none; padding-left: 1px; padding-right: 1px;">
+                                <label><nobr>八级部门:</nobr></label>
+                                <select type="text" class="form-control" id="department-8" onchange="onDepartmentChange8()"></select>
+                            </div>
+                            <div class="col-md-1 col-sm-2" id="id_department-9" style="margin-top: 5px; display: none; padding-left: 1px; padding-right: 1px;">
+                                <label><nobr>九级部门:</nobr></label>
+                                <select type="text" class="form-control" id="department-9" onchange="onDepartmentChange9()"></select>
+                            </div>
+                            <div class="col-md-1 col-sm-2" id="id_department-10" style="margin-top: 5px; display: none; padding-left: 1px; padding-right: 1px;">
+                                <label><nobr>十级部门:</nobr></label>
+                                <select type="text" class="form-control" id="department-10" onchange="onDepartmentChange10()"></select>
+                            </div>
+                            <div class="col-lg-1 col-md-2 col-sm-3" style="margin-top: 5px; padding-left: 1px; padding-right: 1px;">
+                                <label>
+                                    <nobr>
+                                        销售确认:
+                                    </nobr>
+                                </label>
+                                {{ form.sale_sure }}
+                            </div>
+                            <!-- <input type="text" id="txt_value" />
+                            <input type="text" id="txt_text" /> -->
+                            <div class="col-lg-2 col-md-4 col-sm-6" style="float: right; margin-top: 5px;">
+                                <label></label>
+                                <div>                                        
+                                    <button class="btn btn-primary col-md-6 col-sm-6" type="submit" id="submitBtn">搜索</button>
+                                    <button class="btn btn-white col-md-5 col-sm-4" type="reset" style="float: right;" id="resetBtn">重置</button>
+                                </div>
+                            </div>
+
+                            <div style="clear: both;"></div>
+                        </div>
+                        
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="ibox ">
+            <!-- <div class="ibox-title">
+                <h5>jQuery Grid Plugin – jqGrid</h5>
+            </div> -->
+            <div class="ibox-content">
+
+                <div class="jqGrid_wrapper">
+                    <table id="table_list_1"></table>
+                    <div id="pager_list_1"></div>
+                </div>
+                <!-- <p>&nbsp;</p>
+                <h4 class="m-t">高级用法</h4>
+
+
+                <div class="jqGrid_wrapper">
+                    <table id="table_list_2"></table>
+                    <div id="pager_list_2"></div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="wp-modal" tabindex="-1" role="dialog" aria-labelledby="wpModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="wpModalLabel">机构名称：<span></span></h4>
+            </div>
+            <div class="modal-body">
+            <table id="mobal-data" class="table table-bordered table-striped"></table>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="init-data" style="display: none;">{{ init_data }}</div>
+{% endblock %}
+
+{% block js_tail %}
+    <!-- Peity -->
+    <script src="{% static 'js/plugins/peity/jquery.peity.min.js' %}"></script>
+
+    <!-- jqGrid -->
+    <script src="{% static 'js/plugins/jqgrid/i18n/grid.locale-cn.js' %}"></script>
+    <script src="{% static 'js/plugins/jqgrid/jquery.jqGrid.min.js' %}"></script>
+    
+    <!-- 自定义js -->
+    <script src="{% static 'js/content.js' %}"></script>
+
+    <!-- Chosen -->
+    <script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+
+    <!-- JSKnob -->
+    <script src="{% static 'js/plugins/jsKnob/jquery.knob.js' %}"></script>
+
+    <!-- Input Mask-->
+    <!-- <script src="{% static 'js/plugins/jasny/jasny-bootstrap.min.js' %}"></script> -->
+
+    <!-- Date picker -->
+    <script src="{% static 'js/plugins/datapicker/bootstrap-datepicker.js' %}"></script>
+
+
+    <!-- Prettyfile -->
+    <!-- <script src="js/plugins/prettyfile/bootstrap-prettyfile.js"></script> -->
+
+    <!-- NouSlider -->
+    <!-- <script src="js/plugins/nouslider/jquery.nouislider.min.js"></script> -->
+
+    <!-- Switchery -->
+    <!-- <script src="js/plugins/switchery/switchery.js"></script> -->
+
+    <!-- IonRangeSlider -->
+    <script src="{% static 'js/plugins/ionRangeSlider/ion.rangeSlider.min.js' %}"></script>
+
+    <!-- iCheck -->
+    <!-- <script src="js/plugins/iCheck/icheck.min.js"></script> -->
+
+    <!-- MENU -->
+    <!-- <script src="js/plugins/metisMenu/jquery.metisMenu.js"></script> -->
+
+    <!-- Color picker -->
+    <!-- <script src="js/plugins/colorpicker/bootstrap-colorpicker.min.js"></script> -->
+
+    <!-- Clock picker -->
+    <!-- <script src="js/plugins/clockpicker/clockpicker.js"></script> -->
+
+    <!-- Image cropper -->
+    <!-- <script src="js/plugins/cropper/cropper.min.js"></script> -->
+
+    <!-- <script src="{% static 'js/demo/form-advanced-demo.js' %}"></script> -->
+    <script src="{% static 'js/xlsx.core.min.js' %}"></script>
+    <script src="{% static 'js/customer/activity_list.js' %}"></script>
+{% endblock %}

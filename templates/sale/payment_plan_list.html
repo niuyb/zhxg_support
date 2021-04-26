@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block css_tail %}
+<!-- jqgrid-->
+<link href="{% static 'css/plugins/jqgrid/ui.jqgrid.css' %}" rel="stylesheet">
+<link href="{% static 'css/plugins/datapicker/datepicker3.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<script>
+
+</script>
+<div style="display: none;">
+    <div id="department-api">{{ departments_api }}</div>
+    <div id="department-data">{{ department_data }}</div>
+    <div id="department-data-1">{{ department_data_1 }}</div>
+    <div id="search-data-api">{% url 'sale:payment_plan_list_api' %}</div>
+    <div id="fields-to-check">{{ fields_to_check }}</div>
+    <div id="user-log-url">{{ user_log_url }}</div>
+</div>
+<div class="row">
+    <div class="col-sm-12">
+        <div style="margin-top: 10px;"></div>
+        <div class="ibox float-e-margins" style="margin-bottom: 10px;">
+            <div class="ibox-content">
+                <form method="GET" onsubmit="return false;" class="form-horizontal" id="search-form">
+                    <!-- {% csrf_token %} -->
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <!-- <div class="col-lg-1 col-md-2 col-sm-3" style="margin-top: 5px;">
+                                <label><nobr>产品类别：</nobr></label>
+                                {/{ form.product_type }/}
+                            </div> -->
+                            <!-- <div class="col-lg-2 col-md-3 col-sm-6" style="margin-top: 5px;">
+                                <label><nobr>账号名称：</nobr></label>
+                                <input type="text" class="form-control" placeholder="模糊查询"  name="account_name"/>
+                            </div>
+                            <div class="col-lg-1 col-md-2 col-sm-3" style="margin-top: 5px;">
+                                <label><nobr>账号状态：</nobr></label>
+                                {/{ form.account_status }/}
+                                </select>
+                            </div> -->
+                            <!-- <div class="col-lg-1 col-md-2 col-sm-3" style="margin-top: 5px;" title="请输入大于等于{{ login_days_min }}，小于等于{{ login_days_max }}" id="id_login_days">
+                                <label><nobr>逾期天数：</nobr></label>
+                                <input type="number" id="overdue-days-input" class="form-control" 
+                                        value="{% if form.login_days.value %}{{ form.login_days.value }}{% else %}{{ form.login_days.field.value }}{% endif %}" 
+                                        min="{{ form.login_days.field.min }}" max="{{ form.login_days.field.max }}" name="login_days" />
+                            </div>
+                            <div class="col-lg-1 col-md-3 col-sm-6" style="margin-top: 5px;">
+                                <label><nobr>商务：</nobr></label>
+                                <input type="text"  class="form-control" placeholder="模糊查询" name="saler" />
+                            </div> -->
+                            <div class="col-lg-3 col-md-4 col-sm-6" id="data_5" style="margin-top: 5px;">
+                                <label><nobr>计划回款日期：
+                                    <!-- <input type="checkbox" value="1" name="no_plantime" {% if form.no_plantime.value %} checked="checked" {% endif %}
+                                        id="id_no_plantime" style="margin: 0; margin-bottom: 0;" />无</nobr></label> -->
+                                <div class="input-daterange input-group" id="datepicker5">
+                                    <input type="text" class="input-sm form-control" name="plantime_start" placeholder="----------" 
+                                            value="{% if form.plantime_start.value %}{{ form.plantime_start.value }}{% else %}{{ form.plantime_start.field.value }}{% endif %}" />
+                                    <span class="input-group-addon">至</span>
+                                    <input type="text" class="input-sm form-control" name="plantime_end" placeholder="----------"
+                                            value="{% if form.plantime_end.value %}{{ form.plantime_end.value }}{% else %}{{ form.plantime_end.field.value }}{% endif %}" />
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-3" style="margin-top: 5px;">
+                                <label><nobr>逾期状态：</nobr></label>
+                                {{ form.overdue }}
+                                </select>
+                            </div>
+                            <!-- <div class="col-lg-3 col-md-4 col-sm-6" id="data_6" style="margin-top: 5px;">
+                                <label><nobr>承诺回款日期：</nobr></label>
+                                <div class="input-daterange input-group" id="datepicker6">
+                                    <input type="text" class="input-sm form-control" name="activity_start" 
+                                            value="{% if form.activity_start.value %}{{ form.activity_start.value }}{% else %}{{ form.activity_start.field.value }}{% endif %}" />
+                                    <span class="input-group-addon">至</span>
+                                    <input type="text" class="input-sm form-control" name="activity_finish"  
+                                            value="{% if form.activity_finish.value %}{{ form.activity_finish.value }}{% else %}{{ form.activity_finish.field.value }}{% endif %}" />
+                                </div>
+                            </div> -->
+                            <!-- <div class="col-lg-2 col-md-3 col-sm-6" style="margin-top: 5px;">
+                                <label><nobr>客户名称：</nobr></label>
+                                <input type="text" class="form-control" placeholder="模糊查询" name="customer_name">
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-3" style="margin-top: 5px;" id="id_province">
+                                <label><nobr>客户地域：</nobr></label>
+                                {{ form.customer_province }}
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-3" style="margin-top: 5px; display: none;" id="id_city">
+                                <label><nobr>客户地域-市：</nobr></label>
+                                {{ form.customer_city }}
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-3" style="margin-top: 5px; display: none;" id="id_county">
+                                <label><nobr>客户地域-县：</nobr></label>
+                                {{ form.customer_county }}
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-3" style="margin-top: 5px; display: none;">
+                                <input name="department" id="department-value" />
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-3" id="id_department-1" style="margin-top: 5px;">
+                                <label><nobr>部门：</nobr></label>
+                                <select type="text" class="form-control" id="department-1" onchange="onDepartmentChange1()" style="padding-top: 2px;"></select>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-3" id="id_department-2" style="margin-top: 5px; display: none;">
+                                <label><nobr>二级部门:</nobr></label>
+                                <select type="text" class="form-control" id="department-2" onchange="onDepartmentChange2()" style="padding-top: 2px;"></select>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-3" id="id_department-3" style="margin-top: 5px; display: none;">
+                                <label><nobr>三级部门:</nobr></label>
+                                <select type="text" class="form-control" id="department-3" onchange="onDepartmentChange3()" style="padding-top: 2px;"></select>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-3" id="id_department-4" style="margin-top: 5px; display: none;">
+                                <label><nobr>四级部门:</nobr></label>
+                                <select type="text" class="form-control" id="department-4" onchange="onDepartmentChange4()" style="padding-top: 2px;"></select>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-3" id="id_department-5" style="margin-top: 5px; display: none;">
+                                <label><nobr>五级部门:</nobr></label>
+                                <select type="text" class="form-control" id="department-5" onchange="onDepartmentChange5()" style="padding-top: 2px;"></select>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-3" id="id_department-6" style="margin-top: 5px; display: none;">
+                                <label><nobr>六级部门:</nobr></label>
+                                <select type="text" class="form-control" id="department-6" onchange="onDepartmentChange6()"></select>
+                            </div>
+                            <div class="col-md-2 col-sm-2" id="id_department-7" style="margin-top: 5px; display: none;">
+                                <label><nobr>七级部门:</nobr></label>
+                                <select type="text" class="form-control" id="department-7" onchange="onDepartmentChange7()"></select>
+                            </div>
+                            <div class="col-md-1 col-sm-2" id="id_department-8" style="margin-top: 5px; display: none;">
+                                <label><nobr>八级部门:</nobr></label>
+                                <select type="text" class="form-control" id="department-8" onchange="onDepartmentChange8()"></select>
+                            </div>
+                            <div class="col-md-1 col-sm-2" id="id_department-9" style="margin-top: 5px; display: none;">
+                                <label><nobr>九级部门:</nobr></label>
+                                <select type="text" class="form-control" id="department-9" onchange="onDepartmentChange9()"></select>
+                            </div>
+                            <div class="col-md-1 col-sm-2" id="id_department-10" style="margin-top: 5px; display: none;">
+                                <label><nobr>十级部门:</nobr></label>
+                                <select type="text" class="form-control" id="department-10" onchange="onDepartmentChange10()"></select>
+                            </div> -->
+                            
+                            <div class="col-lg-2 col-md-4 col-sm-6" style="float: right; margin-top: 5px;">
+                                <label></label>
+                                <div>                                        
+                                    <button class="btn btn-primary col-md-6 col-sm-6" type="submit" id="submitBtn">搜索</button>
+                                    <button class="btn btn-white col-md-5 col-sm-4" type="reset" style="float: right;" id="resetBtn">重置</button>
+                                </div>
+                            </div>
+                            <div style="clear: both;"></div>
+                        </div>
+                        
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="ibox ">
+            <div class="ibox-content">
+
+                <div class="jqGrid_wrapper">
+                    <table id="table_list_1"></table>
+                    <div id="pager_list_1"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="init-data" style="display: none;">{{ init_data }}</div>
+{% endblock %}
+
+{% block js_tail %}
+    <script src="{% static 'js/plugins/peity/jquery.peity.min.js' %}"></script>
+    <script src="{% static 'js/plugins/jqgrid/i18n/grid.locale-cn.js' %}"></script>
+    <script src="{% static 'js/plugins/jqgrid/jquery.jqGrid.min.js' %}"></script>
+    <script src="{% static 'js/content.js' %}"></script>
+    <script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+    <script src="{% static 'js/plugins/jsKnob/jquery.knob.js' %}"></script>
+    <script src="{% static 'js/plugins/datapicker/bootstrap-datepicker.js' %}"></script>
+    <script src="{% static 'js/plugins/ionRangeSlider/ion.rangeSlider.min.js' %}"></script>
+    <script src="{% static 'js/sale/payment_plan_list.html.js' %}"></script>
+{% endblock %}

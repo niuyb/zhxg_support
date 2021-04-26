@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block css_tail %}
+<!-- jqgrid-->
+<link href="{% static 'css/plugins/jqgrid/ui.jqgrid.css' %}" rel="stylesheet">
+<link href="{% static 'css/plugins/datapicker/datepicker3.css' %}" rel="stylesheet">
+<link href="{% static 'css/competitor/css.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    <div style="display: none;">
+        <div id="occupied_analysis">{% url 'competitor:occupied' %}</div>
+        <div id="money_analysis">{% url 'competitor:money' %}</div>
+        <div id="local_analysis">{% url 'competitor:local' %}</div>
+        <div id="industry_analysis">{% url 'competitor:industry' %}</div>
+        <div id="industry2_analysis">{% url 'competitor:industry2money' %}</div>
+        <div id="status_analysis">{% url 'competitor:customerStatus' %}</div>
+    </div>
+
+    <a href={% url 'competitor:competitor_crm' %}?competitor_name={{ competitor_name }} target='_blank' ><h2 style="text-align: center;margin-top: 20px;margin-bottom: 20px;" id="competitor_id" value="{{ competitor_id }}">竞品名称：{{ competitor_name }}</h2> </a>
+    <div class="evenAna_wrap">
+        <div class="event_content">
+            <div class="event a" the-id="baseinfo" module-id="1">
+                <div class="event_text">
+                    <p>竞品基本信息</p>
+                </div>
+                <div class="detail_text">
+                    <p class="textarea" style="box-sizing: border-box;">{{ remark }}</p>
+                </div>
+            </div>
+            <div class="event b" the-id="customer-status" module-id="2">
+                <div class="event_text">
+                    <p>签单客户状态
+                        <i class="pictips" title="按照竞品签单客户与本公司的合作状态进行分析。"></i>
+                    </p>
+                </div>
+                <div class="echart_wrap">
+                    <ul class="introduce_total mg-20">
+                        <li>
+                            <p>总签单客户数</p>
+                            <p>{{ total }}</p>
+                        </li>
+                        <li>
+                            <p>合作中</p>
+                            <p>{{ account1 }}</p>
+                        </li>
+                        <li>
+                            <p>曾合作</p>
+                            <p>{{ account2 }}</p>
+                        </li>
+                        <li>
+                            <p>未合作</p>
+                            <p>{{ account3 }}</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="event c" the-id="money" module-id="3">
+                <div class="event_text">
+                    <p>签单金额分布
+                        <i class="pictips" title="按照竞品签单的金额进行分析。"></i>
+                    </p>
+                </div>
+                <div class="echart_wrap">
+                    <div class="ibox-content col-sm-12" style="margin-bottom: 20px;">
+                        <div class="col-sm-9" id="moneyEcharts" style="width: 63%;height: 350px;"> </div>
+
+                        <div class="jqGrid_wrapper col-sm-3" style="width: 35%;margin-left: 20px;">
+                            <a href={% url 'competitor:competitor_crm' %}?competitor_name={{ competitor_name }} target='_blank' style="font-size:14px;">>>详情</a>
+                            <table id="table_list_2" ></table>
+                            <div id="pager_list_2" ></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="event d" the-id="local" module-id="4">
+                <div class="event_text">
+                    <p>签单地域分布
+                        <i class="pictips" title="按照竞品签单客户的地域分布进行分析。"></i>
+                    </p>
+                </div>
+                <div class="echart_wrap">
+                    <div class="ibox-content col-sm-12" style="margin:0 auto;margin-bottom: 20px;">
+                        <div class="col-sm-9" id="localEcharts" style="margin:0 auto;width: 63%;height: 500px;"> </div>
+                        <div class="jqGrid_wrapper col-sm-3" style="margin:0 auto;width: 35%;height: 500px;margin-left: 20px;">
+                            <a href={% url 'competitor:competitor_crm' %}?competitor_name={{ competitor_name }} target='_blank' style="font-size:14px;">>>详情</a>
+                            <table id="table_list_1" ></table>
+                            <div id="pager_list_1" ></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="event e" the-id="industry1" module-id="5">
+                <div class="event_text">
+                    <p>签单行业分布
+                        <i class="pictips" title="按照竞品签单客户的一级行业分布进行分析。"></i>
+                    </p>
+                </div>
+                <div class="echart_wrap">
+                    <div class="ibox-content" style="margin-bottom: 20px;">
+                        <div id="industry1echarts" style="margin:0 auto;width: 500px;height: 400px;"> </div>
+                    </div>
+                </div>
+            </div>
+            <div class="event f" the-id="industry2" module-id="6">
+                <div class="event_text">
+                    <p>二级行业分析
+                        <i class="pictips" title="按照竞品签单客户的二级行业及对应的签单平均金额和智慧星光签单对比进行分析。"></i>
+                    </p>
+                </div>
+                <div class="echart_wrap">
+                    <div class="ibox-content  col-sm-12" style="margin:0 auto;margin-bottom: 20px;">
+                        <div class="col-sm-9" id="industry2echarts" style="margin:0 auto;width: 60%;height: 400px;"> </div>
+                        <div class="jqGrid_wrapper col-sm-3" style="margin:0 auto;width: 38%;height: 400px;margin-left: 20px;">
+                            <a href={% url 'competitor:competitor_crm' %}?competitor_name={{ competitor_name }} target='_blank' style="font-size:14px;">>>详情</a>
+                            <table id="table_list_3" ></table>
+                            <div id="pager_list_3" ></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="event g" the-id="customer" module-id="7">
+                <div class="event_text">
+                    <p>占有率分析
+                        <i class="pictips" title="按照签单客户的数量进行分析。"></i>
+                    </p>
+                </div>
+                <div class="echart_wrap">
+                    <div class="ibox-content" style="margin-bottom: 20px;">
+                        <div id="occupiedEcharts" style="margin:0 auto;width: 100%;height: 700px;"> </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="event_nav"></div>
+    </div>
+
+
+    <div id="init-data1" style="display: none;">{{ init_data1 }}</div>
+    <div id="init-data2" style="display: none;">{{ init_data2 }}</div>
+    <div id="init-data3" style="display: none;">{{ init_data3 }}</div>
+
+
+
+{% endblock %}
+
+{% block js_tail %}
+    <!-- jqGrid -->
+    <script src="{% static 'js/plugins/jqgrid/i18n/grid.locale-cn.js' %}"></script>
+    <script src="{% static 'js/plugins/jqgrid/jquery.jqGrid.min.js' %}"></script>
+
+    <script src="{% static 'js/plugins/echarts/echarts.js' %}"></script>
+    <script src="{% static 'js/competitor/competitor_analysis.js' %}"></script>
+    <script src="{% static 'js/plugins/echarts/china.js' %}"></script>
+{% endblock %}

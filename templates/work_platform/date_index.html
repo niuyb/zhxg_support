@@ -1,0 +1,21 @@
+{% extends 'work_platform/base.html' %}
+{% load i18n static %}
+
+{% block css_head %}
+<link rel="stylesheet" href="{% static 'css/WorkPlatform/date.css' %}">
+{% endblock %}
+
+
+{% block body %}
+
+	<h3>点击输入框，选择时间</h3>
+	<input type="text" id="date3" data-options="{'type':'YYYY-MM-DD hh:mm','beginYear':2017,'endYear':2030}" style="width:166px;height:19px;">
+{% endblock %}
+	
+{% block js_tail %}
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/jquery.date.js' %}"></script>
+<script>
+	$.date('#date3');
+</script>
+{% endblock %}

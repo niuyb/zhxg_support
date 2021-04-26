@@ -1,0 +1,847 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block css_tail %}
+<!-- <link rel="stylesheet" href="https://unpkg.com/vue-easytable/umd/css/index.css">
+<link rel="stylesheet" href="https://unpkg.com/element-ui@2.13.1/lib/theme-chalk/index.css"> -->
+
+<link rel="stylesheet" href="{% static 'css/plugins/vue-easytable/umd/css/index.css' %}">
+<link rel="stylesheet" href="{% static 'css/element-ui@2.13.1/lib/theme-chalk/index.css' %}">
+
+<link rel="stylesheet" href="{% static 'css/plugins/vue-easytable/umd/css/v-checkbox-group.css' %}">
+<link rel="stylesheet" href="{% static 'css/plugins/vue-easytable/umd/css/v-search.css' %}">
+{% endblock %}
+
+{% block body %}
+<script src="{% static 'js/plugins/echarts/echarts-all.js' %}"></script>
+<script src="{% static 'js/plugins/echarts/echarts.min.js' %}"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
+
+<script src="{% static 'js/npm/vue@2.6.11' %}"></script>
+<script src="{% static 'js/axios/dist/axios.min.js' %}"></script>
+<script src="{% static 'js/plugins/vue-easytable/easytable.js' %}"></script>
+<!-- <script src="https://unpkg.com/vue-easytable/umd/js/index.js"></script> -->
+<!-- <script src="https://unpkg.com/element-ui@2.13.1/lib/index.js"></script> -->
+<script src="{% static 'js/element-ui@2.13.1/lib/index.js' %}"></script>
+
+<div style="display: none;">
+    <div id="department-api">{{ departments_api }}</div>
+</div>
+<style>
+    .padding-5{
+        padding: 0px 0px;
+    }
+    .mbt-10{
+        margin-bottom: 10px;
+    }
+    .mbt-0{
+        margin-bottom: 0px;
+    }
+    .mr-5{
+        margin-right: 5px;
+    }
+    .mt-10{
+        margin-top: 10px;
+    }
+    .footer-cell-class-name-title{
+        background-color: #f60;
+        color: #fff;
+    }
+    .footer-cell-class-name-normal{
+        color: red;
+    }
+    .el-row {
+        margin-bottom: 20px;
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+    .el-col {
+        border-radius: 4px;
+    }
+    .bg-purple-dark {
+        background: #99a9bf;
+    }
+    .bg-purple {
+        background: #d3dce6;
+    }
+    .bg-purple-light {
+        background: #e5e9f2;
+    }
+    .grid-content {
+        border-radius: 4px;
+        min-height: 36px;
+    }
+    .row-bg {
+        padding: 10px 0;
+        background-color: #f9fafc;
+    }
+    .gray-smaller-label {
+        /* font-size: smaller;  */
+        color: gray;
+        margin-bottom: 5px;
+    }
+    .el-drawer__body {
+        overflow: hidden;
+    }
+</style>
+<div class="row">             
+    <div class="col-md-12 padding-5" style="width: 100%; height: 100%;">   
+        <!-- <button onClick="oppDetailVue.showDetail(2553220)">xxx</button> -->
+        <div id="drawerOpp" style="height: 100%;">
+            <el-drawer
+                loading=true
+                title="我是标题"
+                size="80%"
+                :visible.sync="drawer"
+                :with-header="false"
+                >
+                <div style="margin-top: 20px; margin-left: 20px; margin-right: 20px; padding-right: 10px;">
+                    <!-- detail head -->
+                    <el-row :gutter="20">
+                        <el-col :span="24">
+                            <el-col :span="8" style="margin-left: 0px; padding-left: 0px;">
+                                <div class="grid-content">
+                                    <h1 class=" el-icon-money" style="color: gold; float: left; margin-top: 0px;"></h1>
+                                    <h2 style="float: left; margin-top: 3px;">[[ detail.opportunity_name ]]</h2>
+                                </div>
+                            </el-col>
+                            <el-col :span="8">
+                                <div class="grid-content">
+                                    <!-- <el-button-group>
+                                        <el-button plain size="small" class="el-icon-star-off">加关注</el-button>
+                                        <el-button size="small" class="el-icon-s-comment">讨论一下</el-button>
+                                    </el-button-group> -->
+                                </div>
+                            </el-col>
+                            <el-col :span="8">
+                                <div class="grid-content">
+                                    <!-- <el-button-group style="float: right;">
+                                        <el-button size="small" class="el-icon-edit">编辑</el-button>
+                                        <el-button size="small" class="el-icon-plus">新建</el-button>
+                                        <el-button size="small" class="el-icon-more"></el-button>
+                                    </el-button-group>
+                                    <div style="clear: both;"></div> -->
+                                </div>
+                            </el-col>
+                        </el-col>
+                    </el-row>
+                </div>
+                <div style="margin-top: 20px; margin-left: 20px; margin-right: 20px; overflow: scroll; height: calc(100vh - 62px); padding-right: 10px;">
+                    <div class="ibox" style="padding: 10px;">
+                        <el-row :gutter="20">
+                            <el-col :span="8">
+                                <div class="grid-content">
+                                    <span class="gray-smaller-label">最终客户：&nbsp;</span>
+                                    [[ detail.customer_name || "----"]]
+                                </div>
+                            </el-col>
+                            <el-col :span="4">
+                                <div class="grid-content">
+                                    <span class="gray-smaller-label">商机金额：&nbsp;</span>
+                                    [[ toThousands(detail.opportunity_money) ]]&nbsp;元
+                                </div>
+                            </el-col>
+                            <el-col :span="4">
+                                <div class="grid-content">
+                                    <span class="gray-smaller-label">结单日期：&nbsp;</span>
+                                    <template v-if="detail.closedate">[[ detail.closedate.split(" ")[0] ]]</template>
+                                    <template v-else>----</template>
+                                </div>
+                            </el-col>
+                            <el-col :span="4">
+                                <div class="grid-content">
+                                    <span class="gray-smaller-label">业务类型：&nbsp;</span>
+                                    [[ detail.sale_stage ]]
+                                </div>
+                            </el-col>
+                            <el-col :span="4">
+                                <div class="grid-content">
+                                    <span class="gray-smaller-label">商机负责人：&nbsp;</span>
+                                    [[ detail.saler_name ]]
+                                </div>
+                            </el-col>
+                        </el-row>
+                        <el-row :gutter="20">
+                            <el-col :span="4">
+                                <div class="grid-content">
+                                    <span class="gray-smaller-label">最近签到拜访日期：&nbsp;</span>
+                                    [[ salerRecordData.visit_createdAt ? salerRecordData.visit_createdAt.split(" ")[0] : "----" ]]
+                                </div>
+                            </el-col>
+                            <el-col :span="4">
+                                <div class="grid-content">
+                                    <span class="gray-smaller-label">距今天数：&nbsp;</span>
+                                    [[ salerRecordData.visit_createdAt ? countDays(salerRecordData.visit_createdAt) : "----" ]]
+                                </div>
+                            </el-col>
+                            <el-col :span="4">
+                                <div class="grid-content">
+                                    <span class="gray-smaller-label">最近电话拜访日期：&nbsp;</span>
+                                    [[ salerRecordData.call_createdAt ? salerRecordData.call_createdAt.split(" ")[0] : "----" ]]
+                                </div>
+                            </el-col>
+                            <el-col :span="4">
+                                <div class="grid-content">
+                                    <span class="gray-smaller-label">距今天数：&nbsp;</span>
+                                    [[ salerRecordData.call_createdAt ? countDays(salerRecordData.call_createdAt) : "----" ]]
+                                </div>
+                            </el-col>
+                            <el-col :span="4">
+                                <div class="grid-content">
+                                    <span class="gray-smaller-label">最近快速记录日期：&nbsp;</span>
+                                    [[ salerRecordData.record_createdAt ? salerRecordData.record_createdAt.split(" ")[0] : "----" ]]
+                                </div>
+                            </el-col>
+                            <el-col :span="4">
+                                <div class="grid-content">
+                                    <span class="gray-smaller-label">距今天数：&nbsp;</span>
+                                    [[ salerRecordData.record_createdAt ? countDays(salerRecordData.record_createdAt) : "----" ]]
+                                </div>
+                            </el-col>
+                        </el-row>
+                        <el-row :gutter="20">
+                            <el-col :span="4">
+                                <div class="grid-content">
+                                    <span class="gray-smaller-label">账号数量（秘书）：&nbsp;</span>
+                                    [[ accountActivityData.ms_count || 0 ]]
+                                </div>
+                            </el-col>
+                            <el-col :span="4">
+                                <div class="grid-content">
+                                    <span class="gray-smaller-label">活跃账号数量：&nbsp;</span>
+                                    [[ accountActivityData.act_ms_count || 0 ]]
+                                </div>
+                            </el-col>
+                            <el-col :span="4">
+                                <div class="grid-content">
+                                    <span class="gray-smaller-label">最活跃账号：&nbsp;</span>
+                                    [[ accountActivityData.msname || "----" ]]
+                                </div>
+                            </el-col>
+                            <el-col :span="4">
+                                <div class="grid-content">
+                                    <span class="gray-smaller-label">活跃天数：&nbsp;</span>
+                                    [[ accountActivityData.act_days || "----" ]]
+                                </div>
+                            </el-col>
+                            <el-col :span="4">
+                                <div class="grid-content">
+                                    <span class="gray-smaller-label">最近活跃日期：&nbsp;</span>
+                                    [[ accountActivityData.last_act_date || "----" ]]
+                                </div>
+                            </el-col>
+                            <el-col :span="4">
+                                <div class="grid-content">
+                                    <span class="gray-smaller-label">距今天数：&nbsp;</span>
+                                    [[ accountActivityData.last_act_date ? countDays(accountActivityData.last_act_date): "----" ]]
+                                </div>
+                            </el-col>
+                        </el-row>
+                    </div>
+                    <el-row :gutter="20">
+                        <el-col :span="24">
+                            <div class="grid-content">
+                                <div style="margin-bottom: 3px;"><i class="fa fa-circle"></i>账号活跃情况（近30天）：</div>
+                                <div>                     
+                                    <template>
+                                        <el-table
+                                            v-loading="accountActivityLoading"
+                                            element-loading-text="loading"
+                                            :data="accountActivityData.act_detail"
+                                            highlight-current-row=true
+                                            :max-height="500"
+                                            :header-row-style="{height: '10px'}"
+                                            :header-cell-style="{padding: '5px 0', 'font-size': 'small', 'background-color': '#CCEEFF'}"
+                                            :row-style="{height: '10px'}"
+                                            :cell-style="{padding: '5px 0', 'font-size': 'smaller'}"
+                                            stripe=true
+                                            border>
+                                            <el-table-column
+                                                prop="date"
+                                                label="日期">
+                                            </el-table-column>
+                                            <el-table-column
+                                                prop="msname"
+                                                label="秘书账号">
+                                            </el-table-column>
+                                            <el-table-column
+                                                prop="self"
+                                                label="PC端活跃次数">
+                                            </el-table-column>
+                                            <el-table-column
+                                                prop="phone"
+                                                label="APP端活跃次数">
+                                            </el-table-column>
+                                            <el-table-column
+                                                prop="wechat"
+                                                label="微信端活跃次数">
+                                            </el-table-column>
+                                            <el-table-column
+                                                prop="activity_self"
+                                                label="活跃总次数">
+                                            </el-table-column>
+                                        </el-table>
+                                    </template>
+                                </div>
+                            </div>
+                        </el-col>
+                    </el-row>
+                    <el-row :gutter="20">
+                        <el-col :span="24">
+                            <div class="grid-content">
+                                <div style="margin-bottom: 3px;"><i class="fa fa-circle"></i>商务拜访情况（近30天）：</div>
+                                <div>                     
+                                    <template>
+                                        <el-table
+                                            v-loading="salerActivityLoading"
+                                            element-loading-text="loading"
+                                            highlight-current-row=true
+                                            :data="salerActivityData.items"
+                                            :height="500"
+                                            :header-row-style="{height: '10px', }"
+                                            :header-cell-style="{padding: '5px 0', 'font-size': 'small', 'background-color': '#CCEEFF'}"
+                                            :row-style="{height: '10px'}"
+                                            :cell-style="{padding: '5px 0', 'font-size': 'smaller'}"
+                                            strip=true
+                                            border>
+                                            <el-table-column
+                                                prop="createdAt"
+                                                width="200"
+                                                label="日期">
+                                            </el-table-column>
+                                            <el-table-column
+                                                prop="ownerName"
+                                                width="100"
+                                                label="商务">
+                                            </el-table-column>
+                                            <el-table-column
+                                                prop="entityTypeName"
+                                                width="100"
+                                                label="类型">
+                                            </el-table-column>
+                                            <el-table-column
+                                                prop="content"
+                                                label="内容">
+                                            </el-table-column>
+                                        </el-table>
+                                    </template>
+                                </div>
+                            </div>
+                        </el-col>
+                    </el-row>
+                </div>
+            </el-drawer>
+        </div>    
+    </div>       
+    <div class="col-md-12 padding-5" style="width: 100%; height: 100%;">   
+        <div class="tabs-container">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a data-toggle="tab" href="#tab-main" aria-expanded="false" onclick="toggleFunc(this);">总览</a>
+                </li>
+                <li>
+                    <a data-toggle="tab" href="#tab-customer" aria-expanded="false" onclick="toggleFunc(this);">客户</a>
+                </li>
+                <li>
+                    <a data-toggle="tab" href="#tab-opportunity" aria-expanded="false" onclick="toggleFunc(this);">商机</a>
+                </li>
+                <li>
+                    <a data-toggle="tab" href="#tab-saler" aria-expanded="false" onclick="toggleFunc(this);">商务</a>
+                </li>
+            </ul>
+            <div class="tab-content" style="height: 100%;">
+                <div id="tab-main" class="tab-pane active">
+                    <div class="panel-body">
+                        <div id="main">
+                            <div class="col-md-12 padding-5">
+                                <div class="ibox float-e-margins mbt-0" style="height: 280px;" id="dpt-frame">
+                                    <div class="ibox-title" style="border-bottom:none;background:#fff;">
+                                        <h5 style="width: 100%; text-align: center;">部门架构</h5>
+                                        <div class="ibox-tools"></div>
+                                    </div>
+                                    <div class="ibox-content" style="width: 100%; height: 85%;">
+                                        <div id="g-center-tree" style="width: 100%; height: 100%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 padding-5">
+                                <div class="ibox float-e-margins mbt-0" style="height: 280px;">
+                                    <div class="ibox-title" style="border-bottom:none;background:#fff;">
+                                        <h5 style="width: 100%; text-align: center;">各大区目标完成情况</h5>
+                                        <div class="ibox-tools"></div>
+                                    </div>
+                                    <div class="ibox-content" style="width: 100%; height: 85%;">
+                                        <div id="goal-regions-month" style="width: 100%; height: 100%;">
+                                            <div>
+                                                <el-date-picker
+                                                    size="mini"
+                                                    v-model="month"
+                                                    format="yyyy年MM月"
+                                                    value-format="yyyy/M"
+                                                    type="month"
+                                                    :disabled="disabled"
+                                                    placeholder="选择月">
+                                                </el-date-picker>
+                                            </div>
+                                            <div id="goal-regions-month-chart" style="width: 100%; height: 100%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- <div class="col-md-12 padding-5">
+                                <div class="ibox float-e-margins mbt-0" style="height: 280px;">
+                                    <div class="ibox-title" style="border-bottom:none;background:#fff;">
+                                        <h5 style="width: 100%; text-align: center;">商务日常</h5>
+                                        <div class="ibox-tools"></div>
+                                    </div>
+                                    <div class="ibox-content" style="width: 100%; height: 85%;">
+                                        <div id="about-salers-work-daily" style="width: 100%; height: 100%;">
+                                            <template>
+                                                <el-table
+                                                    v-loading="loading"
+                                                    element-loading-text="loading"
+                                                    :data="tableData"
+                                                    :row-style="rowStyle"
+                                                    :height="200"
+                                                    border>
+                                                    <el-table-column
+                                                        prop="saler"
+                                                        label="商务">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                        prop="depart"
+                                                        :filters="departFilters"
+                                                        :filter-method="filterDepart"
+                                                        filter-placement="bottom-end"
+                                                        label="部门">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                        prop="call"
+                                                        sortable
+                                                        label="电话拜访">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                        prop="visit"
+                                                        sortable
+                                                        label="签到拜访">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                        prop="record"
+                                                        sortable
+                                                        label="快速记录">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                        prop="total"
+                                                        sortable
+                                                        label="拜访总数">
+                                                    </el-table-column>
+                                                </el-table>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> -->
+                            <div class="col-md-12 padding-5">
+                                <div class="ibox float-e-margins mbt-0" style="height: 280px;">
+                                    <div class="ibox-title" style="border-bottom:none;background:#fff;">
+                                        <h5 style="width: 100%; text-align: center;">日常拜访情况</h5>
+                                        <div class="ibox-tools"></div>
+                                    </div>
+                                    <div class="ibox-content" style="width: 100%; height: 85%;">
+                                        <div id="work-daily" style="width: 100%; height: 100%;">
+                                            <div>
+                                                <el-date-picker
+                                                    size="mini"
+                                                    v-model="month"
+                                                    format="yyyy年MM月"
+                                                    value-format="yyyy/M"
+                                                    type="month"
+                                                    :disabled="disabled"
+                                                    placeholder="选择月">
+                                                </el-date-picker>
+                                            </div>
+                                            <div id="work-daily-chart" style="width: 100%; height: 100%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 padding-5">
+                                <div class="ibox float-e-margins mbt-0" style="height: 280px;">
+                                    <div class="ibox-title" style="border-bottom:none;background:#fff;">
+                                        <h5 style="width: 100%; text-align: center;">账号情况</h5>
+                                        <div class="ibox-tools"></div>
+                                    </div>
+                                    <div class="ibox-content" style="width: 100%; height: 85%;">
+                                        <div id="about-account" style="width: 100%; height: 100%;">
+                                            <template>
+                                                <el-table
+                                                    v-loading="loading"
+                                                    element-loading-text="loading"
+                                                    :data="tableData"
+                                                    :row-style="rowStyle"
+                                                    border>
+                                                    <el-table-column
+                                                        prop="product"
+                                                        label="产品">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                        prop="total"
+                                                        label="总数">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                        prop="formal"
+                                                        label="正式">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                        prop="trial"
+                                                        label="试用">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                        prop="stop"
+                                                        label="停用">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                        prop="drop"
+                                                        label="弃用">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                        prop="week_twice"
+                                                        label="周双活">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                        prop="week"
+                                                        label="周活跃">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                        prop="month"
+                                                        label="月活跃">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                        prop="three_months"
+                                                        label="连续三月活跃">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                        prop="dead"
+                                                        label="零活跃">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                        prop="trial_three_months_high"
+                                                        label="试用高活三个月">
+                                                    </el-table-column>
+                                                </el-table>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 padding-5">
+                                <div class="ibox float-e-margins mbt-0" style="height: 280px;">
+                                    <div class="ibox-title" style="border-bottom:none;background:#fff;">
+                                        <h5 style="width: 100%; text-align: center;">商机情况</h5>
+                                        <div class="ibox-tools"></div>
+                                    </div>
+                                    <div class="ibox-content" style="width: 100%; height: 85%;">
+                                        <div id="about-opportunity">
+                                            <template>
+                                                <el-table
+                                                    v-loading="loading"
+                                                    element-loading-text="loading"
+                                                    :data="tableData"
+                                                    border>                            
+                                                    <el-table-column
+                                                        prop="total"
+                                                        label="总数">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                        prop="new"
+                                                        label="新建">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                        prop="no_account"
+                                                        label="未创建账号">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                        prop="stop_three_months"
+                                                        label="商机停留三个月">
+                                                    </el-table-column>
+                                                </el-table>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 padding-5">
+                                <div class="ibox float-e-margins mbt-0" style="height: 280px;">
+                                    <div class="ibox-title" style="border-bottom:none;background:#fff;">
+                                        <h5 style="width: 100%; text-align: center;">客户情况</h5>
+                                        <div class="ibox-tools"></div>
+                                    </div>
+                                    <div class="ibox-content" style="width: 100%; height: 85%;">
+                                        <div id="about-customer">
+                                            <template>
+                                                <el-table
+                                                    v-loading="loading"
+                                                    element-loading-text="loading"
+                                                    :data="tableData"
+                                                    border>
+                                                    <el-table-column
+                                                    prop="total"
+                                                    label="总数">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                    prop="formal"
+                                                    label="正式">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                    prop="important"
+                                                    label="重点">
+                                                    </el-table-column>
+                                                    <el-table-column
+                                                    prop="new"
+                                                    label="新开发">
+                                                    </el-table-column>
+                                                </el-table>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="tab-customer" class="tab-pane">
+                    <div class="panel-body">
+                        <div id="customer">                         
+                            <div>                        
+                                <template>
+                                    <div style="margin-bottom: 5px;">
+                                        <v-table 
+                                                :is-loading = "loading"
+                                                is-vertical-resize
+                                                :vertical-resize-offset='40'
+                                                is-horizontal-resize
+                                                style="width:100%"
+                                                :multiple-sort="false"
+                                                :min-height="350"
+                                                even-bg-color="#f2f2f2"
+                                                :title-rows="tableConfig.titleRows"
+                                                :columns="tableConfig.columns"
+                                                :table-data="tableConfig.tableData"
+                                                row-hover-color="#eee"
+                                                row-click-color="#edf7ff"
+                                                @sort-change="sortChange"
+                                                :paging-index="(pageIndex-1)*pageSize"
+                                                :filter-method="filterMethod"
+                                                @search-method="searchMethod"
+                                                :footer="footer"
+                                                :footer-cell-class-name="setFooterCellClass"
+                                                :footer-row-height="40"
+                                        ></v-table>
+                                    </div>
+                                    <div v-show="needRetry">
+                                        <div class="col-md-4"></div>
+                                        <div class="col-md-4"><el-button @click="retry" style="margin-left: 46%;">重试</el-button></div>
+                                        <div class="col-md-4"></div>
+                                        <div class="clearfix" style="display: none;"></div>
+                                    </div>
+                                    <div class="mt20 mb20 bold mt-10" v-show="!needRetry">
+                                        <div class="col-md-4"></div>
+                                        <div class="col-md-6">
+                                            <v-pagination 
+                                                size="small"
+                                                @page-change="pageChange" 
+                                                @page-size-change="pageSizeChange" 
+                                                :total="total"
+                                                :page-index="pageIndex"
+                                                :page-size="pageSize" 
+                                                :layout="['total', 'prev', 'pager', 'next', 'sizer', 'jumper']"
+                                            ></v-pagination>
+                                        </div>
+                                        <div class="col-md-2"></div>
+                                        <div class="clearfix" style="display: none;"></div>
+                                    </div>
+                                </template>
+                                                
+                                <style>
+                                    .title-cell-class-name-test1 {
+                                        background-color: #2db7f5;
+                                        color:#fff;
+                                    }
+                                    .title-cell-class-name-test2 {
+                                        background-color: #f60;
+                                        color:#fff;
+                                    }
+                                </style>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="tab-opportunity" class="tab-pane" style="height: 100%;">
+                    <div class="panel-body" style="width: 100%; height: 100%;">
+                        <div id="opportunity">              
+                            <div>                        
+                                <template>
+                                    <div style="margin-bottom: 5px;">
+                                        <v-table
+                                                :is-loading = "loading"
+                                                is-vertical-resize
+                                                :vertical-resize-offset='40'
+                                                is-horizontal-resize
+                                                style="width:100%"
+                                                :multiple-sort="false"
+                                                :min-height="350"
+                                                even-bg-color="#f2f2f2"
+                                                :title-rows="tableConfig.titleRows"
+                                                :columns="tableConfig.columns"
+                                                :table-data="tableConfig.tableData"
+                                                row-hover-color="#eee"
+                                                row-click-color="#edf7ff"
+                                                @sort-change="sortChange"
+                                                :paging-index="(pageIndex-1)*pageSize"
+                                                :filter-method="filterMethod"
+                                                @search-method="searchMethod"
+                                                row-height="35"
+                                        ></v-table>
+                                        <!--
+                                                :footer="footer"
+                                                :footer-cell-class-name="setFooterCellClass"
+                                                :footer-row-height="40"
+                                        -->                                                
+                                    </div>
+                                    <div v-show="needRetry">
+                                        <div class="col-md-4"></div>
+                                        <div class="col-md-4"><el-button @click="retry" style="margin-left: 46%;">重试</el-button></div>
+                                        <div class="col-md-4"></div>
+                                        <div class="clearfix" style="display: none;"></div>
+                                    </div>
+                                    <div class="mt20 mb20 bold mt-10" v-show="!needRetry">
+                                        <div class="col-md-4">
+                                            <span>商机金额汇总：<span style="color: red;">[[ opportunity_moneys ]]</span> 元</span>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <v-pagination 
+                                                size="small"
+                                                @page-change="pageChange" 
+                                                @page-size-change="pageSizeChange" 
+                                                :total="total"
+                                                :page-index="pageIndex"
+                                                :page-size="pageSize" 
+                                                :layout="['total', 'prev', 'pager', 'next', 'sizer', 'jumper']"
+                                            ></v-pagination>
+                                        </div>
+                                        <div class="col-md-2"></div>
+                                        <div class="clearfix" style="display: none;"></div>
+                                    </div>
+                                </template>
+                                                
+                                <style>
+                                    .title-cell-class-name-test1 {
+                                        background-color: #2db7f5;
+                                        color:#fff;
+                                    }
+                                    .title-cell-class-name-test2 {
+                                        background-color: #f60;
+                                        color:#fff;
+                                    }
+                                </style>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="tab-saler" class="tab-pane">
+                    <div class="panel-body">
+                        <div id="saler">                         
+                            <div>                        
+                                <template>
+                                    <div style="margin-bottom: 5px;">
+                                        <v-table
+                                                :is-loading = "loading"
+                                                is-vertical-resize
+                                                :vertical-resize-offset='40'
+                                                is-horizontal-resize
+                                                style="width:100%"
+                                                :multiple-sort="false"
+                                                :min-height="350"
+                                                even-bg-color="#f2f2f2"
+                                                :title-rows="tableConfig.titleRows"
+                                                :columns="tableConfig.columns"
+                                                :table-data="tableConfig.tableData"
+                                                row-hover-color="#eee"
+                                                row-click-color="#edf7ff"
+                                                @sort-change="sortChange"
+                                                :paging-index="(pageIndex-1)*pageSize"
+                                                :filter-method="filterMethod"
+                                                @search-method="searchMethod"
+                                                :footer="footer"
+                                                :footer-cell-class-name="setFooterCellClass"
+                                                :footer-row-height="40"
+                                        ></v-table>
+                                    </div>
+                                    <div v-show="needRetry">
+                                        <div class="col-md-4"></div>
+                                        <div class="col-md-4"><el-button @click="retry" style="margin-left: 46%;">重试</el-button></div>
+                                        <div class="col-md-4"></div>
+                                        <div class="clearfix" style="display: none;"></div>
+                                    </div>
+                                    <div class="mt20 mb20 bold mt-10" v-show="!needRetry">
+                                        <div class="col-md-4"></div>
+                                        <div class="col-md-6">
+                                            <v-pagination 
+                                                size="small"
+                                                @page-change="pageChange" 
+                                                @page-size-change="pageSizeChange" 
+                                                :total="total"
+                                                :page-index="pageIndex"
+                                                :page-size="pageSize" 
+                                                :layout="['total', 'prev', 'pager', 'next', 'sizer', 'jumper']"
+                                            ></v-pagination>
+                                        </div>
+                                        <div class="col-md-2"></div>
+                                        <div class="clearfix" style="display: none;"></div>
+                                    </div>
+                                </template>
+                                                
+                                <style>
+                                    .title-cell-class-name-test1 {
+                                        background-color: #2db7f5;
+                                        color:#fff;
+                                    }
+                                    .title-cell-class-name-test2 {
+                                        background-color: #f60;
+                                        color:#fff;
+                                    }
+                                </style>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="clearfix" style="display: none;"></div>
+</div>
+<div id="init-data" style="display: none;">{{ init_data }}</div>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+{% block js_tail %}
+    <!-- Peity -->
+    <script src="{% static 'js/plugins/peity/jquery.peity.min.js' %}"></script>
+    <script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+
+    <!-- JSKnob -->
+    <script src="{% static 'js/plugins/jsKnob/jquery.knob.js' %}"></script>
+    <script src="{% static 'js/plugins/datapicker/bootstrap-datepicker.js' %}"></script>
+    <script src="{% static 'js/plugins/ionRangeSlider/ion.rangeSlider.min.js' %}"></script>
+    <!-- <script src="{% static 'js/plugins/echarts/china.js' %}"></script> -->
+    <!-- <script src="{% static 'js/sale/g-center-data.js' %}"></script> -->
+    <script src="{% static 'js/sale/g-center-customer-tab.js' %}"></script>
+    <script src="{% static 'js/sale/g-center-opportunity-tab.js' %}"></script>
+    <script src="{% static 'js/sale/g-center-saler-tab.js' %}"></script>
+    <script src="{% static 'js/sale/portrait.js' %}"></script>
+    <script src="{% static 'js/sale/g-center.js' %}"></script>
+{% endblock %}

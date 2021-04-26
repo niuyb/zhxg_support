@@ -1,0 +1,165 @@
+*{
+	margin: 0;
+	padding: 0;
+}
+.border_box {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.flex {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.flex_1 {
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+.flex_between {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+.flex_verticle {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+button{
+	margin: 0;
+  	font: inherit;
+  	color: inherit;
+  	overflow: visible;
+  	text-transform: none;
+  	border: none;
+  	text-align: center;
+	outline: 0;
+}
+button:focus{
+	outline: 0;
+	border: 0;
+}
+ul,li{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.rightPart2{
+	width: 100%;
+	border: 1px #ccc solid;
+	font-size: .2rem !important;
+}
+/* 我的日程 */
+.title2{
+	border-bottom: 1px #c7c7c7 solid;
+	padding: .1rem .2rem;
+	font-size: .3rem;
+}
+.today{
+	color:#1890ff;
+	cursor: pointer;
+}
+.schedule{
+	width: 100%;
+}
+.dateShow{
+	border-bottom: 1px #dbdbdb solid;
+}
+table.dates{
+	width: 100%;
+	margin: .1rem 0;
+	border-collapse: collapse;
+    border-spacing: 0px;
+}
+table.dates tr th{
+	padding: 0 .05rem;
+	color: #666;
+	font-weight: normal !important;
+	line-height: .48rem;
+}
+table.dates tr th,
+table.dates tr td{
+	text-align:center;
+}
+table.dates tr td{
+	padding: .06rem 0;
+	cursor: pointer;
+}
+table.dates tr th button{
+	display:inline-block;
+	padding: .06rem;
+	cursor: pointer;
+	width: .28rem;
+	height: .28rem;
+	vertical-align: top;
+    margin-top: .1rem;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+table.dates tr td button{
+	display:inline-block;
+	width: .48rem;
+	line-height: .48rem;
+	text-align: center;
+	background: #fff;
+	cursor: pointer;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+
+}
+.mark1{
+	background: #1890ff !important;
+	color: #fff;
+	border-radius: .04rem;
+}
+
+.padleft{
+	padding-left: .38rem !important;
+}
+.padright{
+	padding-right: .38rem !important;
+}
+.tl{
+	text-align: left !important;
+}
+.tr{
+	text-align: right !important;
+}
+.detailed{
+	padding: .2rem 0 .2rem .3rem;
+}
+.detailed ul.rclist {
+	display: bl0ck;
+	height: 3rem;
+	overflow: hidden;
+	overflow-y: auto;
+}
+.detailed ul li{
+	margin-bottom: .2rem;
+}
+.detailed ul li span{
+	display: inline-block;
+	color: #666;
+}
+.detailed ul li span.time {
+	width: 3rem;
+}
+.detailed ul li span.explain {
+	padding-right: 0.8rem;
+}
+
+.task_list{
+	width: 7rem;
+}

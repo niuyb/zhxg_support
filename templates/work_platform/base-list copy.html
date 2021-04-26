@@ -1,0 +1,74 @@
+{% extends 'work_platform/base.html' %}
+{% load i18n static %}
+
+{% block js_head %}
+
+<script src="{% static 'js/npm/vue@2.6.11' %}"></script>
+<script src="{% static 'js/axios/dist/axios.min.js' %}"></script>
+<script src="{% static 'js/' %}"></script>
+
+{% endblock %}
+
+{% block body %}
+    <style>
+        .flex-item{
+            font-size: 36px;
+            color: #707070;
+            height: 50px;
+        }
+        .tools{
+            height: 80px;
+            border-bottom: solid 1px lightgray;
+        }
+        hr{
+            color: white;
+        }
+    </style>
+    <div class="title">
+        <div id="sidebar-btn"><img  onclick="messager.error('开发中！');" src="/static/img/hamburg64.png" /></div>
+        <div id="top-opts"><h1>{{ title }}</h1></div>
+        <div id="tools">
+            <span id="sort" class="head-icon">
+                <img onclick="messager.error('开发中！');" src="/static/img/sort64-white.png" />
+            </span>
+            <span id="filter" class="head-icon">
+                <img onclick="messager.error('开发中！');" src="/static/img/filter64-white.png" />
+            </span>
+            <span id="search" class="head-icon">
+                <img onclick="messager.error('开发中！');" src="/static/img/search64-white.png" />
+            </span>
+            <span id="add">
+                <img onclick="messager.error('开发中！');" src="/static/img/add64-white.png" />
+            </span>
+        </div>
+        <div style="display: none; clear: both;"></div>
+    </div>
+    <div id="conditions"></div>
+
+    <!-- <div class="flex-container tools">
+        <div id="sort-opts" class="flex-item" style="border-right: solid 1px;">
+            <span>
+                <img src="/static/img/sort48.png" align="absmiddle" />
+            </span>
+            <span onclick="messager.error('开发中！');" class="opt-name">按时间排序</span>
+        </div>
+        <div id="filt-opts" class="flex-item">
+            <span>
+                <img src="/static/img/filter48.png" align="absmiddle" />
+            </span>
+            <span onclick="messager.error('开发中！');" class="opt-name">按条件筛选</span>
+        </div>
+    </div> -->
+    <div id="data-items">
+
+    </div>
+    <div>
+        <span v-if="more">向上滑动加载更多...</span>
+        <span v-else>---- 没有了! ----</span>
+    </div>
+
+    {% block content %}
+    {% endblock %}
+
+
+{% endblock %}

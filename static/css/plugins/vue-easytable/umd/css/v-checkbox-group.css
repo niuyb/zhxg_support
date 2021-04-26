@@ -1,0 +1,10 @@
+ul div.v-checkbox-group{
+	overflow-y: scroll;
+	max-height: 200px;
+	border-top: solid 1px;
+}
+.v-table-title-cell ul.v-dropdown-items{
+	overflow-y: scroll;
+	max-height: 320px;
+	border-top: solid 1px;
+}

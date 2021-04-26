@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block css_tail %}
+<!-- <link rel="stylesheet" href="https://unpkg.com/vue-easytable/umd/css/index.css">
+<link rel="stylesheet" href="https://unpkg.com/element-ui@2.13.1/lib/theme-chalk/index.css"> -->
+
+<!-- <link rel="stylesheet" href="{% static 'css/plugins/vue-easytable/umd/css/index.css' %}"> -->
+<link rel="stylesheet" href="{% static 'css/element-ui@2.13.1/lib/theme-chalk/index.css' %}">
+
+<!-- <link rel="stylesheet" href="{% static 'css/plugins/vue-easytable/umd/css/v-checkbox-group.css' %}">
+<link rel="stylesheet" href="{% static 'css/plugins/vue-easytable/umd/css/v-search.css' %}"> -->
+<link rel="stylesheet" href="{% static 'css/xman/switch.css' %}">
+{% endblock %}
+
+{% block body %}
+<!-- <script src="{% static 'js/plugins/echarts/echarts-all.js' %}"></script>
+<script src="{% static 'js/plugins/echarts/echarts.min.js' %}"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
+
+<script src="{% static 'js/npm/vue@2.6.11' %}"></script>
+<script src="{% static 'js/axios/dist/axios.min.js' %}"></script>
+<script src="{% static 'js/plugins/qs/qs.min.js' %}"></script>
+<!-- <script src="{% static 'js/plugins/vue-easytable/easytable.js' %}"></script> -->
+<!-- <script src="https://unpkg.com/vue-easytable/umd/js/index.js"></script> -->
+<!-- <script src="https://unpkg.com/element-ui@2.13.1/lib/index.js"></script> -->
+<script src="{% static 'js/element-ui@2.13.1/lib/index.js' %}"></script>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div style="margin-top: 10px;"></div>
+        <div class="ibox float-e-margins" style="margin-bottom: 10px;">
+            <div class="ibox-content">
+                <form  method="POST" action="{% url 'xman:data_node' %}" class="form-horizontal" id="search-form" autocomplete="off">
+                    <!-- {% csrf_token %} -->
+                    {% for value in setting_result %}
+                    <div class="form-group">
+                        <label title="{{ value.node_desc }}">{{ value.node_name }}：</label>
+                        <textarea class="form-control" rows="3" name="node_{{ value.node_id }}">{{ value.member_list }}</textarea>
+                    </div>
+                    {% endfor %}
+                    <div class="form-group" style="float: right;margin-top: 20px;margin-right: 30px;">
+                        <button class="btn btn-primary" type="submit" id="submitBtn">提交修改</button>
+                    </div>
+                    <div style="clear: both;"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+{% block js_tail %}
+    <!-- Peity -->
+    <script src="{% static 'js/plugins/peity/jquery.peity.min.js' %}"></script>
+    <script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+
+    <!-- JSKnob -->
+    <script src="{% static 'js/plugins/jsKnob/jquery.knob.js' %}"></script>
+    <script src="{% static 'js/plugins/datapicker/bootstrap-datepicker.js' %}"></script>
+    <script src="{% static 'js/plugins/ionRangeSlider/ion.rangeSlider.min.js' %}"></script>
+    <!-- <script src="{% static 'js/xman/user-list.js' %}"></script> -->
+{% endblock %}

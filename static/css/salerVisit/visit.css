@@ -1,0 +1,161 @@
+.evenAna_map {
+    height: 98%;
+    margin: 0 auto;
+    margin-bottom: 30px;
+    float: left;
+    color: #333;
+    font-size: 12px;
+    overflow: hidden;
+    width: 78%;
+    min-height: 700px;
+    margin-top: 20px;
+}
+
+.event_content {
+    width: 99%;
+    margin-bottom: 20px;
+    /*float: right;*/
+}
+.event {
+    width: 100%;
+    box-sizing: border-box;
+    background: #fff;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.event .event_text {
+    width: 100%;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.event .event_text p {
+    position: relative;
+    /*width: 170px;*/
+    height: 48px;
+    line-height: 48px;
+    color: #1f96d2;
+    font-size: 16px;
+    font-weight: 700;
+    border-bottom: 2px solid #1f96d2;
+    text-align: left;
+    padding-left: 20px;
+}
+
+
+.event .detail_text {
+    padding: 10px 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    position: relative;
+}
+
+.evenAna_wrap .event_content .event .detail_text .textarea {
+    width: 100%;
+    word-break: break-all;
+    min-height: 40px;
+    line-height: 1.4;
+    font-size: 14px;
+    color: #333;
+    border: 1px solid #fff;
+    background: #fff;
+    resize: none;
+    padding: 10px 15px 10px 10px;
+    box-sizing: border-box;
+}
+
+
+
+
+.evenAna_sort {
+    height: 98%;
+    margin: 0 auto;
+    margin-bottom: 30px;
+    float: right;
+    color: #333;
+    font-size: 12px;
+    overflow: hidden;
+    width: 22%;
+    min-height: 700px;
+    margin-top: 20px;
+}
+
+#top_data {
+    width: 100%;
+}
+
+#area_sort {
+    height: 320px;
+    width: 100%;
+}
+#map{
+    height: 750px;
+    width: 100%;
+}
+#container{
+    height: 750px;
+    width: 100%;
+}
+#visit_detail {
+    width: 100%;
+}
+
+.vpt {
+    font-size:15px;
+    color: black;
+    font-weight: bold;
+    text-align: center;
+}
+
+.vpd {
+    font-size:16px;
+    color: green;
+    font-weight: bold;
+    text-align: center;
+}
+
+.visit_data {
+
+    display: inline-block;
+    text-align: center;
+    width:25%;
+    height: 50px;
+}
+
+
+ul.mg-5 {
+    overflow: hidden;
+    margin:5px;
+    padding: 0;
+    list-style: none;
+    font-weight: 400;
+
+}
+
+.ul {
+    font-size: 15px;
+    font-weight: 500;
+    text-align: left;
+    width:90%;
+    padding-left: 10px;
+    margin:5px;
+    margin-left: 30px;
+    list-style: none;
+
+}
+
+.li {
+    padding-bottom: 2px;
+    padding-top: 2px;
+}
+
+.tip {
+    font-size: 12px;
+    font-style: normal;
+    color: #07080799;
+    text-align: right;
+    float:right;
+    padding-right: 10px;
+    margin-left: -55px;
+
+}

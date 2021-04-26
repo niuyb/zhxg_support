@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block css_tail %}
+<!-- <link rel="stylesheet" href="https://unpkg.com/vue-easytable/umd/css/index.css">
+<link rel="stylesheet" href="https://unpkg.com/element-ui@2.13.1/lib/theme-chalk/index.css"> -->
+
+<link rel="stylesheet" href="{% static 'css/element-ui@2.13.1/lib/theme-chalk/index.css' %}">
+<link rel="stylesheet" href="{% static 'css/xman/switch.css' %}">
+
+<!-- <link rel="stylesheet" href="{% static 'css/plugins/vue-easytable/umd/css/index.css' %}">
+<link rel="stylesheet" href="{% static 'css/plugins/vue-easytable/umd/css/v-checkbox-group.css' %}">
+<link rel="stylesheet" href="{% static 'css/plugins/vue-easytable/umd/css/v-search.css' %}"> -->
+{% endblock %}
+
+{% block body %}
+<!-- <script src="{% static 'js/plugins/echarts/echarts-all.js' %}"></script>
+<script src="{% static 'js/plugins/echarts/echarts.min.js' %}"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
+
+<script src="{% static 'js/npm/vue@2.6.11' %}"></script>
+<script src="{% static 'js/axios/dist/axios.min.js' %}"></script>
+<script src="{% static 'js/plugins/qs/qs.min.js' %}"></script>
+<!-- <script src="{% static 'js/plugins/vue-easytable/easytable.js' %}"></script> -->
+<!-- <script src="https://unpkg.com/vue-easytable/umd/js/index.js"></script> -->
+<!-- <script src="https://unpkg.com/element-ui@2.13.1/lib/index.js"></script> -->
+<script src="{% static 'js/element-ui@2.13.1/lib/index.js' %}"></script>
+
+<style>
+    .padding-5{
+        padding: 0px 0px;
+    }
+    .mbt-10{
+        margin-bottom: 10px;
+    }
+    .mbt-0{
+        margin-bottom: 0px;
+    }
+    .mr-5{
+        margin-right: 5px;
+    }
+    .mt-10{
+        margin-top: 10px;
+    }
+    .footer-cell-class-name-title{
+        background-color: #f60;
+        color: #fff;
+    }
+    .footer-cell-class-name-normal{
+        color: red;
+    }
+</style>
+<div class="row">
+    <div class="col-md-12 padding-5" style="width: 100%; height: 100%;">
+        <div class="ibox">
+            <div class="ibox-title" style="padding-top: 8px;">    
+                <div id="button-group">
+                    <el-button-group>
+                        <el-button @click="refresh" type="primary" icon="el-icon-refresh" :loading="refreshing" class="el-button--mini">
+                            刷新
+                        </el-button>
+                        <el-button @click="multipleDelete" type="danger" icon="el-icon-delete" :loading="deleting" class="el-button--mini">
+                            删除
+                        </el-button>
+                        <el-button @click="create" type="success" icon="el-icon-plus" class="el-button--mini">
+                            新建
+                        </el-button>
+                        <!-- <el-button @click="multipleAccess" type="warning" icon="el-icon-lock" class="el-button--mini">
+                            授权
+                        </el-button> -->
+                        <!-- <el-button @click="create" type="primary" icon="el-icon-plus" class="el-button--mini">
+                            启用
+                        </el-button>
+                        <el-button @click="create" type="primary" icon="el-icon-plus" class="el-button--mini">
+                            禁用
+                        </el-button> -->
+                    </el-button-group>
+                </div>
+            </div>
+            <div class="ibox-content">
+                {% csrf_token %}
+                <div id="app">                      
+                    
+                    <el-table
+                        ref="multipleTable"
+                        :data="tableData"
+                        row-key="id"
+                        tooltip-effect="dark"
+                        style="width: 100%; margin-bottom: 20px;"
+                        border
+                        fit
+                        @selection-change="handleSelectionChange">
+                        <el-table-column
+                          type="selection"
+                          prop="id"
+                          width="55">
+                        </el-table-column>
+                        <el-table-column
+                          label="名称"
+                          prop="name"
+                          width="200">
+                        </el-table-column>
+                        <el-table-column
+                          prop="code"
+                          label="代码"
+                          width="200">
+                        </el-table-column>
+                        <el-table-column
+                          prop="status"
+                          label="状态"
+                          width="120">
+                          <template slot-scope="scope">
+                            <el-switch 
+                                @change="changeStatus(scope.$index, scope.row)" 
+                                v-model="scope.row.status" 
+                                active-color="#00A854"
+                                active-text="启用"
+                                inactive-text="禁用">
+                            </el-switch>
+                          </template>
+                        </el-table-column>
+                        <el-table-column
+                          prop="rank"
+                          label="序号"
+                          width="120">
+                        </el-table-column>
+                        <el-table-column
+                            prop="operation"
+                            label="操作"
+                            width="300">
+                            <template slot="header" slot-scope="scope">
+                                <el-input
+                                    v-model="search"
+                                    size="mini"
+                                    placeholder="输入关键字搜索"/>
+                          </template>
+                          <template slot-scope="scope">
+                            <el-button-group>
+                                <el-button
+                                  size="mini"
+                                  type="primary"
+                                  @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                                <el-popover
+                                    width="600"
+                                    @show="showUsers(scope.$index, scope.row)"
+                                    placement="bottom-end"
+                                    trigger="click">
+                                    <div v-if="users.length > 0"><a v-for="user in users" :href="'/xman/user/detail?id=' + user.id" style="width: 19%;">[[ user.username ]]&nbsp;&nbsp;&nbsp;&nbsp;</a></div>
+                                    <div v-else>[[ userTooltip ]]</div>
+                                    <el-button
+                                        id="accessButton" 
+                                        slot="reference"
+                                        size="mini"
+                                        type="warning"
+                                        >
+                                        人员
+                                    </el-button>
+                                </el-popover>
+                                <el-button
+                                  size="mini"
+                                  type="danger"
+                                  @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                              </el-button-group>
+                          </template>
+                        </el-table-column>
+                    </el-table>
+                    <el-pagination
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                        :current-page="currentPage"
+                        :page-sizes="pageSizes"
+                        :page-size="pageSize"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="totalNum">
+                    </el-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="clearfix" style="display: none;"></div>
+</div>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+{% block js_tail %}
+    <!-- Peity -->
+    <script src="{% static 'js/plugins/peity/jquery.peity.min.js' %}"></script>
+    <script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+
+    <!-- JSKnob -->
+    <script src="{% static 'js/plugins/jsKnob/jquery.knob.js' %}"></script>
+    <script src="{% static 'js/plugins/datapicker/bootstrap-datepicker.js' %}"></script>
+    <script src="{% static 'js/plugins/ionRangeSlider/ion.rangeSlider.min.js' %}"></script>
+    <script src="{% static 'js/xman/role-list.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,308 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block css_tail %}
+<!-- <link rel="stylesheet" href="https://unpkg.com/vue-easytable/umd/css/index.css">
+<link rel="stylesheet" href="https://unpkg.com/element-ui@2.13.1/lib/theme-chalk/index.css"> -->
+
+<!-- <link rel="stylesheet" href="{% static 'css/plugins/vue-easytable/umd/css/index.css' %}"> -->
+<link rel="stylesheet" href="{% static 'css/element-ui@2.13.1/lib/theme-chalk/index.css' %}">
+
+<!-- <link rel="stylesheet" href="{% static 'css/plugins/vue-easytable/umd/css/v-checkbox-group.css' %}">
+<link rel="stylesheet" href="{% static 'css/plugins/vue-easytable/umd/css/v-search.css' %}"> -->
+<link rel="stylesheet" href="{% static 'css/xman/switch.css' %}">
+{% endblock %}
+
+{% block body %}
+<script src="{% static 'js/plugins/echarts/echarts-all.js' %}"></script>
+<script src="{% static 'js/plugins/echarts/echarts.min.js' %}"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
+
+<script src="{% static 'js/npm/vue@2.6.11' %}"></script>
+<script src="{% static 'js/axios/dist/axios.min.js' %}"></script>
+<script src="{% static 'js/plugins/qs/qs.min.js' %}"></script>
+<!-- <script src="{% static 'js/plugins/vue-easytable/easytable.js' %}"></script> -->
+<!-- <script src="https://unpkg.com/vue-easytable/umd/js/index.js"></script> -->
+<!-- <script src="https://unpkg.com/element-ui@2.13.1/lib/index.js"></script> -->
+<script src="{% static 'js/element-ui@2.13.1/lib/index.js' %}"></script>
+
+<style>
+    .padding-5{
+        padding: 5px 5px;
+    }
+    .mbt-10{
+        margin-bottom: 10px;
+    }
+    .mbt-0{
+        margin-bottom: 0px;
+    }
+    .mr-5{
+        margin-right: 5px;
+    }
+    .mt-10{
+        margin-top: 10px;
+    }
+    .footer-cell-class-name-title{
+        background-color: #f60;
+        color: #fff;
+    }
+    .footer-cell-class-name-normal{
+        color: red;
+    }
+    .el-form-item__content{
+        height: 100%;
+    } 
+    .custom-tree-node {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 14px;
+        padding-right: 8px;
+    }
+    .el-popover__title{
+        text-align: center;
+    }
+    .el-popper .el-form-item__content{
+        text-align: center;
+    }
+    .el-popper .el-input{
+        padding-right: 50px;
+    }
+</style>
+<div class="row">
+    <div class="col-md-12 padding-5" style="width: 100%; height: 100%;">
+        <div class="ibox">
+            <div class="ibox-title" style="padding-top: 8px;">      
+                <div id="button-group" v-show="bgShow" style="margin-left: 60px;">
+                    <el-button-group>
+                        <el-button @click="dlt" type="danger" class="el-button--mini">
+                            删除
+                            <i class="el-icon-delete el-icon--right"></i>
+                        </el-button>
+                        <el-button @click="create" type="primary" icon="el-icon-plus" class="el-button--mini">
+                            新建
+                        </el-button>
+                    </el-button-group>
+                </div>
+            </div>
+            <div class="ibox-content">               
+                <div id="app">         
+                    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+                        <el-row :gutter="20">
+                            <el-col :xs="24" :sm="24" :md="12" :lg="8">
+                                <div class="grid-content bg-purple">
+                                    {% csrf_token %}
+                                    <el-form-item label="ID" prop="id" style="display: none;">
+                                      <el-input v-model="ruleForm.id"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="名称" prop="name" style="">
+                                      <el-input v-model="ruleForm.name"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="父级模块" prop="parent" style="">
+                                        <div style="border: solid rgb(228, 223, 223) 1px;">
+                                            <el-tree
+                                                :data="moduleTree.data"
+                                                show-checkbox
+                                                node-key="id"
+                                                check-strictly
+                                                ref = "moduleTree"
+                                                :default-expanded-keys="moduleTree.defaultExpandedKeys"
+                                                :default-checked-keys="moduleTree.defaultCheckedKeys"
+                                                :props="moduleTree.defaultProps"
+                                                @check-change="handleModuleNodeClick">
+                                            </el-tree>
+                                        </div>
+                                    </el-form-item>
+                                </div>
+                            </el-col>
+                            <el-col :xs="24" :sm="24" :md="12" :lg="8">
+                                <div class="grid-content bg-purple">
+                                    <el-form-item label="代码" prop="code" style="">
+                                      <el-input v-model="ruleForm.code"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="图标" prop="icon" style="">
+                                      <el-input v-model="ruleForm.icon"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="链接" prop="url" style="">
+                                      <el-input v-model="ruleForm.url"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="状态" prop="status" style="">
+                                        <el-switch 
+                                            v-model="ruleForm.status" 
+                                            active-color="#00A854"
+                                            active-text="显示"
+                                            inactive-text="隐藏">
+                                        </el-switch>
+                                    </el-form-item>
+                                    <el-form-item label="排序" prop="rank" style="">
+                                      <el-input v-model.number="ruleForm.rank"></el-input>
+                                    </el-form-item>
+                                </div>
+                            </el-col>
+                            <el-col :xs="24" :sm="24" :md="12" :lg="8">
+                                <div class="grid-content bg-purple" id="permissions">
+                                    <el-form-item label="权限" prop="pids" style="">
+                                        <div style="border: solid rgb(228, 223, 223) 1px;">
+                                            <el-tree v-if="permTree.data.length"
+                                                :data="permTree.data"
+                                                :node-key="permTree.nodeKey"
+                                                ref = "permTree"
+                                                default-expand-all
+                                                :default-checked-keys="permTree.defaultCheckedKeys"
+                                                :props="permTree.defaultProps">
+                                                  <span class="custom-tree-node" slot-scope="{ node, data }">
+                                                    <span>[[ node.label ]] ： [[ data.code ]]</span>
+                                                    <span>
+                                                        <template v-if="mode">
+                                                              <el-button v-if="node.data.status"
+                                                                type="text"
+                                                                size="mini"
+                                                                @click="() => changePermStatus(node, data)">
+                                                                禁用
+                                                              </el-button>
+                                                              <el-button v-else
+                                                                type="text"
+                                                                size="mini"
+                                                                @click="() => changePermStatus(node, data)">
+                                                                启用
+                                                              </el-button>                                                            
+                                                        </template>
+                                                      <el-button
+                                                        type="text"
+                                                        size="mini"
+                                                        @click="() => deletePerm(node, data)">
+                                                        删除
+                                                      </el-button>
+                                                    </span>
+                                                  </span>
+                                            </el-tree>
+                                            <div style="width: 100%; text-align: center;">
+                                                <el-popover
+                                                    placement="bottom"
+                                                    title="请选择权限"
+                                                    width="300"
+                                                    trigger="click">
+                                                    
+                                                    <el-tree
+                                                        :data="permTree.defaultData"
+                                                        :node-key="permTree.defaultNodeKey"
+                                                        ref = "permTree2"
+                                                        default-expand-all
+                                                        :props="permTree.defaultProps">
+                                                        <span class="custom-tree-node" slot-scope="{ node, data }">
+                                                            <span>[[ node.label ]] ： [[ data.code ]]</span>
+                                                            <span>
+                                                              <el-button
+                                                                type="text"
+                                                                size="mini"
+                                                                @click="() => addPerm(node, data)">
+                                                                添加
+                                                              </el-button>
+                                                            </span>
+                                                        </span>
+                                                    </el-tree>
+                                                    <!-- <div style="text-align: center;">
+                                                    </div> -->
+                                                    <el-button 
+                                                        id="quickAdd"
+                                                        slot="reference"
+                                                        type="primary" 
+                                                        size="mini"
+                                                        icon="el-icon-plus">
+                                                        快速添加
+                                                    </el-button>
+                                                </el-popover>
+                                                        <el-popover
+                                                            placement="bottom"
+                                                            title="自定义权限"
+                                                            width="300"
+                                                            trigger="click">
+                                                            <el-form-item label="名称" style="">
+                                                                <el-input v-model="permForm.name" prop="name"></el-input>
+                                                            </el-form-item>
+                                                            <el-form-item label="代码" style="">
+                                                                <el-input v-model="permForm.code" prop="code"></el-input>
+                                                            </el-form-item>                   
+                                                            <el-form-item>
+                                                                <el-button 
+                                                                    type="primary"
+                                                                    size="mini" 
+                                                                    @click="createPerm">
+                                                                    添加
+                                                                </el-button>
+                                                            </el-form-item>  
+                                                            <el-button 
+                                                                id="customeAdd"
+                                                                slot="reference"
+                                                                type="primary" 
+                                                                size="mini"
+                                                                icon="el-icon-plus">
+                                                                自定义...
+                                                            </el-button>
+                                                        </el-popover>
+                                            </div>
+                                        </div>
+                                    </el-form-item>
+                                    <!-- <el-form-item v-else label="权限" prop="pids" style="">
+                                        <div style="border: solid rgb(228, 223, 223) 1px;">
+                                            <el-tree
+                                                :data="permTree.data"
+                                                show-checkbox
+                                                :node-key="permTree.nodeKey"
+                                                ref = "permTree"
+                                                default-expand-all
+                                                :default-checked-keys="permTree.defaultCheckedKeys"
+                                                :props="permTree.defaultProps">
+                                            </el-tree>
+                                        </div>
+                                    </el-form-item>
+                                    <div style="width: 100%; text-align: center;">
+                                        <el-button 
+                                            type="primary" 
+                                            size="mini"
+                                            icon="el-icon-plus"
+                                            @click="() => addPerm()">
+                                                
+                                            </el-button>
+                                    </div> -->
+                                </div>
+                            </el-col>
+                        </el-row>
+                        <el-row :gutter="20">
+                            <el-col>
+                                <div class="grid-content bg-purple" style="text-align: center;">                     
+                                    <el-form-item v-if="ruleForm.id">
+                                      <el-button type="primary" :disabled="!canClick" @click="submitForm('ruleForm')">提交修改</el-button>
+                                    </el-form-item>                       
+                                    <el-form-item v-else>
+                                      <el-button type="primary" :disabled="!canClick" @click="submitForm('ruleForm')">立即创建</el-button>
+                                      <el-button @click="resetForm('ruleForm')">重置</el-button>
+                                    </el-form-item>  
+                                </div>
+                            </el-col>
+                        </el-row>
+                      </el-form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="clearfix" style="display: none;"></div>
+</div>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+{% block js_tail %}
+    <!-- Peity -->
+    <script src="{% static 'js/plugins/peity/jquery.peity.min.js' %}"></script>
+    <script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+
+    <!-- JSKnob -->
+    <script src="{% static 'js/plugins/jsKnob/jquery.knob.js' %}"></script>
+    <script src="{% static 'js/plugins/datapicker/bootstrap-datepicker.js' %}"></script>
+    <script src="{% static 'js/plugins/ionRangeSlider/ion.rangeSlider.min.js' %}"></script>
+    <script src="{% static 'js/xman/module.js' %}"></script>
+{% endblock %}

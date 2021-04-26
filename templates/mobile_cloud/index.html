@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block css_tail %}
+<!-- jqgrid-->
+<link href="{% static 'css/plugins/jqgrid/ui.jqgrid.css' %}" rel="stylesheet">
+<link href="{% static 'css/plugins/datapicker/datepicker3.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<style>
+    table { table-layout: fixed;}
+    table tr td {
+        overflow:hidden;
+        white-space:nowrap;
+        text-overflow:ellipsis;
+        -o-text-overflow:ellipsis;
+        -moz-text-overflow: ellipsis;
+        -webkit-text-overflow: ellipsis;
+    }
+</style>
+<div class="row">
+    <div class="col-sm-12">
+        <div style="margin-top: 10px;"></div>
+        <div class="ibox float-e-margins" style="margin-bottom: 10px;">
+            <div class="ibox-content">
+                <form enctype="multipart/form-data" method="post" action="{% url 'mobile_cloud:index' %}" class="form-inline" id="uploadForm">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="uploadFile">请上传文件</label>
+                        <input type="file" name="uploadFile">
+
+                    </div>
+                    <div class="form-group" style="margin-top: 20px;">
+                        <button class="btn btn-primary" type="submit">确定</button>
+                        <button class="btn btn-white" type="reset" id="resetBtn">重置</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="ibox ">
+            <div class="ibox-content">
+                <form class="form-horizontal form-inline">
+                    {% csrf_token %}
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="col-xs-1">客户编号</th>
+                                <th class="col-xs-2">客户名称</th>
+                                <th class="col-xs-1">结算金额</th>
+                                <th class="col-xs-2">订购开始时间</th>
+                                <th class="col-xs-2">订购结束时间</th>
+                                <th class="col-xs-1">省份</th>
+                                <th class="col-xs-1">地市</th>
+                                <th class="col-xs-2">一级行业</th>
+                                <th class="col-xs-2">二级行业</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for data in result %}
+                            <tr the-id="data_table">
+                                <td title="{{ data.account_code }}">
+                                    <input type="hidden" name="account_code" value="{{ data.account_code }}">
+                                    {{ data.account_code }}
+                                </d>
+                                <td title="{{data.account_name}}">{{ data.account_name }}</td>
+                                <td>{{ data.sum_money }}</td>
+                                <td>{{ data.start_date }}</td>
+                                <td>{{ data.end_date }}</td>
+                                <td>{{ data.province }}</td>
+                                <td>{{ data.city }}</td>
+                                <td >
+                                    <select class="form-control" name="industry1" style="height: 35px; width: 120px;">
+                                        <option value=""  style="border: red;">*请选择*</option>
+                                        {% for industry1 in industry1_list %}
+                                        {% if data.industry1 in industry1.label %}
+                                        <option value="{{ industry1.value }}" selected>{{ industry1.label }}</option>
+                                        {% else %}
+                                        <option value="{{ industry1.value }}">{{ industry1.label }}</option>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="form-control" name="industry2" style="height: 35px; width: 120px;">
+                                        <option value=""  style="border: red;">*请选择*</option>
+                                        {% for industry2 in data.industry2_list %}
+                                        {% if data.industry2 in industry2.label %}
+                                        <option value="{{ industry2.value }}" selected>{{ industry2.label }}</option>
+                                        {% else %}
+                                        <option value="{{ industry2.value }}">{{ industry2.label }}</option>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="row" style="margin-top: 20px;">
+                        <input type="hidden" name="file_name" value="{{ file_name }}">
+                        <input type="hidden" name="file_path" value="{% static 'tmp' %}">
+                        {% if result %} 
+                        <button class="btn btn-primary" style="float: right;" type="button" id="submit_to_crm" jump="{% url 'mobile_cloud:send_to_crm' %}">确定提交销售易</button>
+                        {% else %}
+                        <button class="btn btn-primary" style="float: right;" type="button" id="submit_to_crm" jump="{% url 'mobile_cloud:send_to_crm' %}" disabled>确定提交销售易</button>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js_tail %}
+    <script src="{% static 'js/plugins/peity/jquery.peity.min.js' %}"></script>
+    <script src="{% static 'js/plugins/jqgrid/i18n/grid.locale-cn.js' %}"></script>
+    <script src="{% static 'js/plugins/jqgrid/jquery.jqGrid.min.js' %}"></script>
+    <script src="{% static 'js/content.js' %}"></script>
+    <script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+    <script src="{% static 'js/plugins/jsKnob/jquery.knob.js' %}"></script>
+    <script src="{% static 'js/plugins/datapicker/bootstrap-datepicker.js' %}"></script>
+    <script src="{% static 'js/plugins/ionRangeSlider/ion.rangeSlider.min.js' %}"></script>
+    <script src="{% static 'js/mobile_cloud/mobile_cloud.js' %}"></script>
+{% endblock %}

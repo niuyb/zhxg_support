@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block css_tail %}
+<!-- jqgrid-->
+<link href="{% static 'css/plugins/jqgrid/ui.jqgrid.css' %}" rel="stylesheet">
+<link href="{% static 'css/plugins/datapicker/datepicker3.css' %}" rel="stylesheet">
+<link href="{% static 'css/salerVisit/visit.css' %}" rel="stylesheet">
+<link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css"/>
+{% endblock %}
+{% block body %}
+    <style>
+        a.navbar-minimalize.minimalize-styl-2.btn.btn-info {
+            color: #ffffff !important;
+            background-color: #19a9d5;
+            border-color: #189ec8;
+            border-radius: 3px;
+            padding: 4px 12px;
+            margin: 14px 5px 5px 20px;
+            font-size: 14px;
+            float: left;
+        }
+        h3.navbar-form-custom {
+            color: inherit;
+        }
+    </style>
+    <div style="display: none;">
+        <div id="visit_detail">{{ visit_detail }}</div>
+
+    </div>
+    <div id="left_body" class="evenAna_map">
+        <div class="event_content">
+            <div id="top_data" class="event a" >
+                <div class="event_text">
+                    <p>全国签到<span class="tip">数据更新至：{{ end_time }}</span></p>
+
+                </div>
+
+                {% for t in visit_count %}
+                    <div class="col-lg-2 col-md-4 col-sm-6">
+                        <p class="vpt">{{ t.date }}签到</p>
+                        <a href={% url 'salerVisit:visit_table' %}?saler=&department=&activity_start={{ t.activity_start }}&activity_finish={{ t.activity_finish }} target='_blank' ><p class="vpd">{{ t.count }}</p></a>
+                    </div>
+
+                {% endfor %}
+                <div style="display: none;clear: both;"></div>
+            </div>
+            <div id="map" class="event" >
+                <div class="event_text">
+                    <p>今日签到分布</p>
+                </div>
+                <div id="container" ></div>
+
+            </div>
+
+        </div>
+    </div>
+    <div id="right_body" class="evenAna_sort">
+        <div class="event_content">
+
+            <div id="visit_detail" class="event a" style="height: 600px;">
+                <div class="event_text">
+                    <p>今日签到数据</p>
+                </div>
+                <div class="timeline" style="overflow: scroll;height: 95%;">
+                    <ul>
+                        {% for row in visit_detail %}
+                            <li style="">
+                                {% if row.problem_type == '1' or row.problem_type == '2' or row.problem_type == '3' or row.problem_type == '4' %}
+                                    <img src={% static 'img/警报.png' %} >
+                                    <p style="color:red;"><b>拜访问题：{{ row.problem_content }}</b></p>
+                                {% else %}
+                                    <img src={% static 'img/足迹2蓝色.png' %}>
+                                {% endif %}
+                                <p>时间：<b>{{ row.starttime }} </b></p>
+                                <p>商务：<a href={% url 'salerVisit:visit_table' %}?saler={{ row.salename }}&department=&activity_start=&activity_finish= target='_blank' >{{ row.salename }}</a></p>
+                                <p>商机：{{ row.opportunityname }}</p>
+                                <p>最终客户：<a href='{{ crm_customer_jump_url }}{{ row.accountid }}'  target='_blank'>{{ row.accountname }}</a></p>
+                                <p>打卡地：{{ row.location }}</p>
+                                <p >距离客户：{{ row.distance }}公里</p>
+                                <p style="margin-bottom: 10px">沟通内容：{{ row.content }}</p>
+                                <hr style="border: 1px dashed #ff0000;">
+                            </li>
+                        {% endfor %}
+                    </ul>
+
+                </div>
+            </div>
+
+            </div>
+        <div id="area_sort"  class="event a" >
+                <div class="event_text">
+                    <p>昨日政务大区签到排名</p>
+                </div>
+                <ul class="ul">
+                    {% for row in group_count %}
+                        <li>{{ row.num }}.   {{ row.group_name }}:  <a href={% url 'salerVisit:visit_table' %}?saler=&department={{ row.group_id }}&activity_start={{ row.activity_start }}&activity_finish={{ row.activity_finish }} target='_blank' >{{ row.count }}次</a></li>
+                    {% endfor %}
+
+                </ul>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block js_tail %}
+    <!-- Peity -->
+    <script src="{% static 'js/plugins/peity/jquery.peity.min.js' %}"></script>
+        <!-- jqGrid -->
+    <script src="{% static 'js/plugins/jqgrid/i18n/grid.locale-cn.js' %}"></script>
+    <script src="{% static 'js/plugins/jqgrid/jquery.jqGrid.min.js' %}"></script>
+    <script src="{% static 'js/plugins/echarts/echarts.js' %}"></script>
+    <script src="{% static 'js/salerVisit/salerVisit.js' %}"></script>
+    <script src="{% static 'js/plugins/echarts/china.js' %}"></script>
+{#    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=74de11ccc613aaffcae9e285d085e6e0"></script>#}
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=e812a2e8a5f61640fc68e09c3572dcf1"></script>
+{% endblock %}
+

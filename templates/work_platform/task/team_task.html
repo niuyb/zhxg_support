@@ -1,0 +1,200 @@
+{% extends 'work_platform/base-list.html' %}
+{% load static %}
+
+{% block css_head %}
+    <link rel="stylesheet" href="{% static 'css/npm/vant@2.9/lib/index.css' %}" />
+    <link href="{% static 'css/WorkPlatform/team_task.css' %}?version=0.0.1" rel="stylesheet">
+    <link href="{% static 'css/WorkPlatform/date.css' %}?version=0.0.1" rel="stylesheet">
+{% endblock %}
+
+
+{% block data_items %}
+<div id="body">
+    <title>我的团队</title>
+    <!--计算rem自适应方案的js -->
+    <script>
+        (function(){var l=window.document;var b=document.documentElement;var g=window;var m=0;var d=0;var e;window.remFlexible=window.remFlexible||{};var f=window.remFlexible;function j(){var n=b.clientWidth;b.style.fontSize=n/7.5+"px"}var i=l.querySelector('meta[name="viewport"]');if(i){i.parentNode.removeChild(i)}var h=g.navigator.appVersion.match(/android/gi);var c=g.navigator.appVersion.match(/iphone/gi);var k=g.devicePixelRatio;if(c){if(k>=3&&(!m||m>=3)){m=3}else{if(k>=2&&(!m||m>=2)){m=2}else{m=1}}}else{m=1}d=1/m;i=document.createElement("meta");i.setAttribute("name","viewport");i.setAttribute("content","initial-scale="+d+", maximum-scale="+d+", minimum-scale="+d+", user-scalable=no");if(b.firstElementChild){b.firstElementChild.appendChild(i)}else{var a=l.createElement("div");a.appendChild(i);l.write(a.innerHTML)}g.addEventListener("resize",function(){clearTimeout(e);e=setTimeout(j,300)},false);g.addEventListener("pageshow",function(n){if(n.persisted){clearTimeout(e);e=setTimeout(j,300)}},false);if(l.readyState==="complete"){j()}else{l.addEventListener("DOMContentLoaded",function(n){j()},false)}j();b.setAttribute("data-dpr",m);f.dpr=m;f.px2rem=function(n){return n/100};f.rem2px=function(n){return n*100}})();
+    </script>
+    <script src="{% static 'js/plugins/echarts/echarts.min.js' %}?version=0.0.1"></script>
+    <script src="{% static 'js/jquery.min.js' %}?version=0.0.1"></script>
+    <script src="{% static 'js/axios/dist/axios.min.js' %}?version=0.0.1"></script>
+    <script src="{% static 'js/npm/vue@2.6.11' %}?version=0.0.1"></script>
+    <script src="{% static 'js/work_platform/team.js' %}?version=0.0.1"></script>
+
+    <div id="level" style="display:none">{{ level }}</div>
+    <div id="departid" style="display:none">{{ departid }}</div>
+	<!-- 弹窗 -->
+	<div class="dialog" id="add_task_div">
+		<div class="dialog_container">
+			<div class="dialog_title flex_v_center"><span>任务</span><span class="dialog_close">&times;</span></div>
+			<div class="doalog_content">
+				<div class="dialog_list flex_verticle">
+					<span class="dialog_list_name">任务名称</span>
+					<input id="task_name" type="text" class="dialog_list_input border_box flex_1" placeholder="请输入任务名称"/>
+				</div>
+				<div class="dialog_list flex_verticle">
+					<span class="dialog_list_name">开始时间</span>
+					<input type="text" class="dialog_list_input border_box flex_1" placeholder="请输入开始时间"  id="bTime" data-options="{'type':'YYYY-MM-DD hh:mm','beginYear':2010,'endYear':2088}"/>
+				</div>
+				<div class="dialog_list flex_verticle">
+					<span class="dialog_list_name no_star">开始提醒</span>
+					<select class="dialog_list_select border_box flex_1" id="b_remind">
+                        <option value="3600">提前1个小时</option>
+                        <option value="21600">提前6个小时</option>
+                        <option value="86400">提前1天</option>
+                        <option value="172800">提前2天</option>
+					</select>
+				</div>
+				<div class="dialog_list flex_verticle">
+					<span class="dialog_list_name">截止时间</span>
+					<input type="text" class="dialog_list_input border_box flex_1" placeholder="请输入截止时间" id="eTime" data-options="{'type':'YYYY-MM-DD hh:mm','beginYear':2010,'endYear':2088}"/>
+				</div>
+				<div class="dialog_list flex_verticle">
+					<span class="dialog_list_name no_star">截止提醒</span>
+					<select class="dialog_list_select border_box flex_1" id="e_remind">
+                        <option value="86400">提前1天</option>
+                        <option value="3600">提前1个小时</option>
+                        <option value="21600">提前6个小时</option>
+                        <option value="172800">提前2天</option>
+					</select>
+				</div>
+				<div class="dialog_list flex_verticle">
+					<span class="dialog_list_name">负责人员</span>
+					<input type="text" id="ownerid" class="dialog_list_input border_box mian_user" placeholder="负责人"/>
+					<input type="text" id="member" class="dialog_list_input border_box other_user flex_1" placeholder="请输入或选填参与人"/>
+				</div>
+				<div class="dialog_list flex_verticle">
+					<span class="dialog_list_name no_star">关联业务</span>
+					<select class="dialog_list_select border_box business" id="blongid">
+						<option value="3">商机</option>
+						<option value="1">客户</option>
+					</select>
+					<input type="text" name="" id="entityObjectId" class="dialog_list_input border_box other_user flex_1" placeholder="请输入并选择"/>
+				</div>
+
+				<div class="dialog_list flex_verticle desc_box">
+					<span class="dialog_list_name no_star">详细描述</span>
+					<textarea id="description" class="dialog_list_textarea border_box flex_1"></textarea>
+					<p class="txt_tips">最多不超过500字</p>
+				</div>
+				<div class="dialog_list flex_verticle">
+					<div class="file_box border_box">
+						<span>&nbsp;+&nbsp;&nbsp;添加文件</span>
+						<input type="file" class="dialog_file"/>
+					</div>
+				</div>
+			</div>
+			<div class="doalog_btns_box">
+				<button class="cancle_btn">取消</button>
+				<button class="create_btn">确认</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- 锚点 -->
+	<div class="anchor_point_box" id="point_box" style="background-color: white">
+		<div class="line">&nbsp;</div>
+		<div class="border_box anchor_box flex">
+			<a id="point_mypie" onclick="point(this)"><img src="{% static "img/task/pei.png" %}" style="margin-top: 20%;margin-left: 20% "></a>
+			<a id="point_myteam" onclick="point(this)"><img src="{% static "img/task/team.png" %}" style="margin-top: 20%;margin-left: 20% "></a>
+			<a id="point_mytask" onclick="point(this)"><img src="{% static "img/task/opportunity.png" %}" style="margin-top: 20%;margin-left: 20%"></a>
+		</div>
+	</div>
+
+	<div class="border_box task_content_box teaminfo_box" id="top">
+		<div class="task_list_box border_box">
+            <div class="list_txt flex_between">
+                <div class="txt_left flex_1" id="team_name">团队名称：</div>
+                <div class="txt_center flex_1" id="team_leader">管理人员：</div>
+            </div>
+			<div class="list_txt flex_between">
+                <div class="txt_right flex_1" id="team_num">团队任务数：</div>
+                <div class="txt_right flex_1" id="team_per">人均任务数：</div>
+            </div>
+        </div>
+     </div>
+
+	<!-- 团队任务饱和度 -->
+	<h3 class="task_title ellipsis" id="mypie" >团队任务统计</h3>
+	<div class="border_box task_content_box pie_box" id="pieBox"></div>
+
+	<!-- 我的团队 -->
+	<h3 class="task_title ellipsis" id="myteam">我的团队</h3>
+	<div class="border_box task_content_box myteam_box" id="team_department">
+{#		<!-- 第一种展示 -->#}
+{#		<div class="task_list_box border_box">#}
+{#            <div class="list_txt flex_between">#}
+{#                <div class="txt_left flex_1">部门：<a href="https://www.baidu.com" target="_blank">河北</a></div>#}
+{#                <div class="txt_center flex_1">本周任务：30</div>#}
+{#				<div class="txt_right flex_1">客户数：1000</div>#}
+{#            </div>#}
+{#            <div class="list_txt flex_between">#}
+{#                <div class="txt_left flex_1">任务覆盖客户数：20</div>#}
+{#                <div class="txt_center flex_1">完成数：21</div>#}
+{#            </div>#}
+{#			<div class="list_txt flex_between">#}
+{#                <div class="txt_right flex_1">延期数：4</div>#}
+{#                <div class="txt_right flex_1">删除数：4</div>#}
+{#            </div>#}
+{#        </div>#}
+{#		<!-- 第二种展示 -->#}
+{#		<div class="task_list_box border_box">#}
+{#           <div class="list_txt flex_between">#}
+{#				<div class="txt_left flex_1">人员：<a href="https://www.baidu.com" target="_blank">开心果</a></div>#}
+{#				<div class="txt_right flex_1">部门：研发组</div>#}
+{#			</div>#}
+{#			<div class="list_txt flex_between">#}
+{#				<div class="txt_left flex_1">任务数：30</div>#}
+{#				<div class="txt_right flex_1">客户数：30</div>#}
+{#			</div>#}
+{#			<div class="list_txt flex_between">#}
+{#				<div class="txt_left flex_1">覆盖任务的客户数：6</div>#}
+{#				<div class="txt_right flex_1">任务完成数：4</div>#}
+{#			</div>#}
+{#			<div class="list_txt flex_between">#}
+{#				<div class="txt_left flex_1">任务延期数：30</div>#}
+{#				<div class="txt_right flex_1">删除任务数：4</div>#}
+{#			</div>#}
+{#        </div>#}
+	</div>
+
+	<!-- 推荐任务商机 -->
+	<h3 class="task_title ellipsis" id="mytask">推荐任务商机</h3>
+    <div class="task_content_box  border_box" id="opportunity">
+    </div>
+
+	<!-- echarts 弹窗 -->
+    <div class="dialog_pie" value="hide">
+        <div class="dialog_title flex_v_center"><span>任务详情</span><span class="dialog_close_pie">&times;</span></div>
+		<div class="dialog_container_pie" id="pei_infos">
+        <div class="dialog_title flex_v_center"><span>任务详情</span><span class="dialog_close_pie">&times;</span></div>
+			<div class="task_list_box border_box">
+				<div class="list_txt flex_between">
+					<div class="txt_left ">人员：开心果</div>
+					<div class="txt_right flex_1">部门：研发组</div>
+				</div>
+				<div class="list_txt flex_between">
+					<div class="txt_left ">任务数：30</div>
+					<div class="txt_right flex_1">客户数：30</div>
+				</div>
+				<div class="list_txt flex_between">
+					<div class="txt_left ">覆盖任务的客户数：6</div>
+					<div class="txt_right flex_1">任务完成数：4</div>
+				</div>
+				<div class="list_txt flex_between">
+					<div class="txt_left ">任务延期数：30</div>
+					<div class="txt_right flex_1">删除任务数：4</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script src="{% static 'js/jquery.date.js' %}?version=0.0.1"></script>
+{% endblock %}
+
+
+{% block js_tail %}
+<script src="{% static 'js/work_platform/base/list-mixin.js' %}?version=1.0.6"></script>
+<script src="{% static 'js/work_platform/base/sidebar-mixin.js' %}?version=1.0.6"></script>
+{% endblock %}

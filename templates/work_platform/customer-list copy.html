@@ -1,0 +1,18 @@
+{% extends 'work_platform/base-list.html' %}
+{% load i18n static %}
+
+{% block content %}
+<div>
+    <ul class="data-ul">
+        <li class="data-li" v-for="item in items">
+            <span>
+                <span class="data-item-name">[[ item.accountName ]]</span>
+            </span>
+            <span class="data-item-btns">
+                <span title="绑定微信群" v-if="item.wechat_group_id"><img src="/static/img/bind-wechat.png" /></span>
+                <span title="解绑微信群" v-else><img src="/static/img/unbind-wechat.png" /></span>
+            </span>
+        </li>
+    </ul>
+</div>
+{% endblock %}

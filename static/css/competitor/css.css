@@ -1,0 +1,136 @@
+.evenAna_wrap {
+    height: 98%;
+    margin: 0 auto;
+    color: #333;
+    font-size: 12px;
+    overflow: hidden;
+    width: 100%;
+    min-height: 700px;
+}
+
+.event_content {
+    width: 98%;
+    margin:0 auto;
+    /*float: right;*/
+}
+
+.event {
+    width: 100%;
+    box-sizing: border-box;
+    background: #fff;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.a {
+    height: auto;
+}
+
+.event .event_text {
+    width: 100%;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.event .event_text p {
+    position: relative;
+    width: 100px;
+    height: 48px;
+    line-height: 48px;
+    color: #1f96d2;
+    font-size: 16px;
+    font-weight: 700;
+    border-bottom: 2px solid #1f96d2;
+    text-align: center;
+    margin-left: 20px;
+}
+
+.event .detail_text {
+    padding: 10px 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    position: relative;
+}
+
+.evenAna_wrap .event_content .event .detail_text .textarea {
+    width: 100%;
+    word-break: break-all;
+    min-height: 40px;
+    line-height: 1.4;
+    font-size: 14px;
+    color: #333;
+    border: 1px solid #fff;
+    background: #fff;
+    resize: none;
+    padding: 10px 15px 10px 10px;
+    box-sizing: border-box;
+}
+
+.pictips {
+    display: inline-block;
+    position: absolute;
+    top: 15px;
+    left: 110px;
+    width: 16px;
+    height: 16px;
+    background: url(/static/img/wenhao_icon.png) no-repeat;
+}
+
+i {
+    font-style: normal;
+}
+
+.introduce_total {
+    width: 80%;
+    height: 70px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+ul.mg-20 {
+
+    margin:20px auto;
+    padding: 0;
+    list-style: none;
+    font-weight: 400;
+}
+
+.introduce_total li {
+    width: 22%;
+    height: 80px;
+    text-align: center;
+    padding-top: 10px;
+    box-sizing: border-box;
+}
+
+.introduce_total li:first-of-type {
+    background: url(/static/img/transRouter_f.png) no-repeat;
+    background-size: 100% 100%;
+}
+
+.introduce_total li:nth-of-type(2) {
+    background: url(/static/img/transRouter_s.png) no-repeat;
+    background-size: 100% 100%;
+}
+
+.introduce_total li:nth-of-type(3) {
+    background: url(/static/img/transRouter_s.png) no-repeat;
+    background-size: 100% 100%;
+}
+
+.introduce_total li:last-of-type {
+    background: url(/static/img/transRouter_t.png) no-repeat;
+    background-size: 100% 100%;
+}
+
+.introduce_total li p {
+    line-height: 25px;
+    font-size: 16px;
+    color: #fff;
+}
+
+.introduce_total li p:nth-of-type(2) {
+    font-size: 18px;
+    font-weight: 700;
+}
+

@@ -1,0 +1,159 @@
+ *{
+	 margin: 0;
+	 padding: 0;
+ }
+.flex {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.flex_1 {
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+.flex_between {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+.flex_verticle {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+.ellipsis {
+  white-space: nowrap;
+  word-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis
+}
+
+.border_box {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+ body,
+ html {
+	 background-color: rgb(236, 236, 236);
+	 background-color: #f2f2f2;
+ }
+ .customer_title {
+	 font-size: .36rem;
+	 background: #fff;
+	 padding: .12rem .3rem;
+	 font-weight: bold;
+ }
+ .list_content_box {
+	 padding: .2rem .3rem;
+ }
+ .list_box {
+	 background: #fff;
+	 font-size: .3rem;
+	 border-radius: .04rem;
+	 padding: .2rem;
+	 line-height: .48rem;
+	 box-shadow: 0 2px 8px rgba(0,0,0,.15);
+	 margin-bottom: .2rem;
+ }
+ .list_title {
+	 font-size: .28rem;
+	 font-weight: bold;
+ }
+ .list_left {
+	 font-size: .20rem;
+	 width: 66%;
+ }
+ .list_right {
+	font-size: .20rem;
+ }
+ .btom {
+	 border-bottom: .01rem solid #e8e8e8;
+	 padding-bottom: .1rem;
+	 margin-bottom: .1rem;
+ }
+ .list_btn_box  button {
+	display: inline-block;
+	text-transform: none;
+	padding: .08rem .16rem;
+	font-size: .24rem;
+	border-radius: .04rem;
+	margin: 0 .1rem 0 0;  
+	/* background: #1890ff; */
+	color: #fff;
+	border-color: #1890ff;
+	text-shadow: 0 -1px 0 rgba(0,0,0,.12);
+	box-shadow: 0 0.02rem 0 rgba(0,0,0,.045);
+	cursor: pointer;
+	outline: 0;
+	border: none;
+ }
+
+ .bind_btn{
+	 background-color: #1890ff;
+ }
+ .unbind_btn{
+	 background-color: red;
+ }
+ .rebind-btn{
+	 background-color: orange;
+ }
+ .popup-title{
+	 font-weight: bold;
+
+	 text-transform: capitalize;
+ }
+ .popup-title span{
+	 display: block;
+	 margin-top: .14rem;
+ }
+ #top-opts div.van-dropdown-menu__bar{
+	 background-color: #5cadf0;
+	 height: .4rem;
+ }
+ #top-opts span.van-dropdown-menu__title{
+	 color: white;
+ }
+ #filtersPopup{
+	 top: auto;
+ }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

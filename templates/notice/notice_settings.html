@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block css_tail %}
+<link rel="stylesheet" href="{% static 'css/element-ui@2.13.1/lib/theme-chalk/index.css' %}">
+{% endblock %}
+
+{% block body %}
+
+<script src="{% static 'js/npm/vue@2.6.11' %}"></script>
+<script src="{% static 'js/axios/dist/axios.min.js' %}"></script>
+<script src="{% static 'js/element-ui@2.13.1/lib/index.js' %}"></script>
+
+
+<style>
+    .el-row {
+      margin-bottom: 20px;
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+    .el-col {
+      border-radius: 4px;
+    }
+    .bg-purple-dark {
+      background: #99a9bf;
+    }
+    .bg-purple {
+      background: #d3dce6;
+    }
+    .bg-purple-light {
+      background: #e5e9f2;
+    }
+    .grid-content {
+      border-radius: 4px;
+      min-height: 36px;
+    }
+    .row-bg {
+      padding: 10px 0;
+      background-color: #f9fafc;
+    }
+  </style>
+<div style="display: none;">
+</div>
+<div class="row" style="margin: 0; height: 100%;">
+    <div class="col-sm-12" style="margin: 0; height: 100%;">
+        <div style="margin-top: 10px;"></div>
+        <div class="ibox float-e-margins" style="margin: 0; height: 100%;">
+            <div class="ibox-content" style="margin: 0; height: 100%;">
+                <!-- {% for ns in notice_setting_list %}
+                    <form method="GET" onsubmit="return false;" class="form-horizontal" id="setting-form-{{ ns.notice_type_id }}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <div class="col-md-10 col-lg-8 col-xl-6 col-md-offset-1 col-lg-offset-2 col-xl-offset-3">
+                                <div class="col-sm-12" style="margin-top: 5px;">
+                                    <input style="display: none;" name="ding_user_id" value="{{ request.user.dtalkid }}" />
+                                    <span style="font-size: large;" class="col-sm-6" title="{{ ns.comment }}"><nobr>{{ forloop.counter }}、{{ ns.name }}：</nobr></span>
+                                    <span class="col-sm-2">
+                                        <input type="checkbox" class="js-switch js-check-change" 
+                                            data-switchery="true" style="display: none;" 
+                                            checked="{% if ns.status %}true{% else %}false{% endif %}" />
+                                    </span>
+                                    <span style="font-size: large;" class="check-change js-check-change-field col-sm-4">{% if ns.status %}已开启{% else %}已禁用{% endif %}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                {% endfor %} -->
+                <div id="main" v-if="ok">
+                    <template v-for="(setting, index) in settings">
+                        <el-row :gutter="20">
+                            <el-col :span="4"><div class="grid-content"></div></el-col>
+                            <el-col :span="12">
+                                <div class="grid-content" :title="setting.comment">
+                                    [[ index + 1 ]]、[[ setting.name ]]
+                                </div>
+                            </el-col>
+                            <el-col :span="4">
+                                <div class="grid-content">
+                                    <el-switch
+                                        v-model="setting.status"
+                                        active-color="#13ce66"
+                                        inactive-color="#ff4949"
+                                        @change="changeSwitch(setting)">
+                                    </el-switch>
+                                    <template v-if="setting.status">已开启</template>
+                                    <template v-else>已关闭</template>
+                                </div>
+                            </el-col>
+                            <el-col :span="4"><div class="grid-content"></div></el-col>
+                        </el-row>
+                    </template>
+                    <!-- <template v-for="setting in settings">
+                        <el-switch
+                            v-model="setting.status"
+                            on-color="#00A854"
+                            on-text="启动"
+                            on-value="1"
+                            off-color="#F04134"
+                            off-text="禁止"
+                            off-value="0"
+                            @change="changeSwitch(setting)">
+                        </el-switch>
+                    </template> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="init-data" style="display: none;">{{ init_data }}</div>
+{% endblock %}
+
+{% block js_tail %}
+    <script src="{% static 'js/plugins/peity/jquery.peity.min.js' %}"></script>
+    <script src="{% static 'js/plugins/jqgrid/i18n/grid.locale-cn.js' %}"></script>
+    <script src="{% static 'js/plugins/jqgrid/jquery.jqGrid.min.js' %}"></script>
+    <script src="{% static 'js/content.js' %}"></script>
+    <script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+    <script src="{% static 'js/plugins/jsKnob/jquery.knob.js' %}"></script>
+    <script src="{% static 'js/plugins/datapicker/bootstrap-datepicker.js' %}"></script>
+    <!-- <script src="{% static 'js/notice/notice_settings.html.js' %}"></script> -->
+    <script src="{% static 'js/notice/notice_settings.js' %}"></script>
+{% endblock %}

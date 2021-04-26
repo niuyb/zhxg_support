@@ -1,0 +1,222 @@
+{% extends 'work_platform/base-list.html' %}
+{% load static %}
+
+{% block css_head %}
+    <link rel="stylesheet" href="{% static 'css/npm/vant@2.9/lib/index.css' %}" />
+    <link href="{% static 'css/WorkPlatform/date.css' %}?version=0.0.1" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<head runat="server">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>员工周计划</title>
+{#    <!-- import CSS -->#}
+{#    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">#}
+{#    <!-- import Vue before Element -->#}
+{#    <script src="https://unpkg.com/vue/dist/vue.js"></script>#}
+{#    <!-- import JavaScript -->#}
+{#    <script src="https://unpkg.com/element-ui/lib/index.js"></script>#}
+
+    <link href="{% static 'css/WorkPlatform/base.css' %}" rel="stylesheet">
+    <link href="{% static 'css/WorkPlatform/task.css' %}" rel="stylesheet">
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/axios/dist/axios.min.js' %}"></script>
+    <script src="{% static 'js/npm/vue@2.6.11' %}"></script>
+    <script src="{% static 'js/work_platform/base/list-mixin.js' %}?version=1.0.6"></script>
+    <script src="{% static 'js/work_platform/base/sidebar-mixin.js' %}?version=1.0.6"></script>
+    <script src="{% static 'js/work_platform/task.js' %}"></script>
+    <!--计算rem自适应方案的js -->
+    <script>
+        (function(){var l=window.document;var b=document.documentElement;var g=window;var m=0;var d=0;var e;window.remFlexible=window.remFlexible||{};var f=window.remFlexible;function j(){var n=b.clientWidth;b.style.fontSize=n/7.5+"px"}var i=l.querySelector('meta[name="viewport"]');if(i){i.parentNode.removeChild(i)}var h=g.navigator.appVersion.match(/android/gi);var c=g.navigator.appVersion.match(/iphone/gi);var k=g.devicePixelRatio;if(c){if(k>=3&&(!m||m>=3)){m=3}else{if(k>=2&&(!m||m>=2)){m=2}else{m=1}}}else{m=1}d=1/m;i=document.createElement("meta");i.setAttribute("name","viewport");i.setAttribute("content","initial-scale="+d+", maximum-scale="+d+", minimum-scale="+d+", user-scalable=no");if(b.firstElementChild){b.firstElementChild.appendChild(i)}else{var a=l.createElement("div");a.appendChild(i);l.write(a.innerHTML)}g.addEventListener("resize",function(){clearTimeout(e);e=setTimeout(j,300)},false);g.addEventListener("pageshow",function(n){if(n.persisted){clearTimeout(e);e=setTimeout(j,300)}},false);if(l.readyState==="complete"){j()}else{l.addEventListener("DOMContentLoaded",function(n){j()},false)}j();b.setAttribute("data-dpr",m);f.dpr=m;f.px2rem=function(n){return n/100};f.rem2px=function(n){return n*100}})();
+    </script>
+{#    element-ui#}
+
+</head>
+<div id="body" >
+
+    <div id="uid" style="display:none">{{ userid }}</div>
+
+    <style>
+    .lastM{
+        background:#fff url({% static 'img/task/double-left.png' %}) no-repeat;
+        background-position:0 8px;
+    }
+    .lastW{
+        background:#fff url({% static 'img/task/pre.png' %}) no-repeat;
+        background-position:5px 8px;
+    }
+    .nextW{
+        background:#fff url({% static 'img/task/next.png' %}) no-repeat;
+        background-position:5px 8px;
+    }
+    .nextM{
+        background:#fff url({% static 'img/task/double-right.png' %}) no-repeat;
+        background-position:14px 8px;
+    }
+    .mark2{
+    background: url({% static 'img/task/spoint.png' %}) no-repeat top;
+    }
+    .time{
+    width:120px;
+    float:left;
+    background: url({% static 'img/task/point.png' %}) no-repeat left;
+    padding-left:14px;
+    }
+    </style>
+
+	<!--我的日程 start -->
+    <div id="rightPart2" class="box rightPart2">
+        <div class="title2 border_box flex_between">我的日程<span class="today"></span></div>
+        <div class="schedule">
+            <div id="calendar" class="dateShow">
+                <table id="dayshow" class="dates">
+                    <tr>
+                        <th><button id="lastM" class="lastM" title="上一月"></button></th>
+                        <th class="tl"><button id="last-week" class="lastW" title="上一周"></button></th>
+                        <th id="curday" ref="curday" style="text-align:right" colspan="2">2017年3月19</th>
+                        <th>-</th>
+                        <th id="curday7" style="text-align:left" colspan="2">2017年3月25日</th>
+                        <th class="tr"><button id="next-week" class="nextW" title="下一周"></button></th>
+                        <th><button id="nextM" class="nextM" title="下一月"></button></th>
+                    </tr>
+                    <tr>
+                        <td class="padleft" colspan="2"><button>日</button></td>
+                        <td><button>一</button></td>
+                        <td><button>二</button></td>
+                        <td><button>三</button></td>
+                        <td><button>四</button></td>
+                        <td><button>五</button></td>
+                        <td class="padright" colspan="2"><button>六</button></td>
+                    </tr>
+                    <tr id="monitor">
+                        <td class="padleft" colspan="2"><button @click="click_task_infos($event)">19</button></td>
+                        <td><button @click="click_task_infos($event)">20</button></td>
+                        <td><button @click="click_task_infos($event)">21</button></td>
+                        <td><button @click="click_task_infos($event)">22</button></td>
+                        <td><button @click="click_task_infos($event)">23</button></td>
+                        <td><button @click="click_task_infos($event)">24</button></td>
+                        <td class="padright" colspan="2"><button @click="click_task_infos($event)">25</button></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="detailed">
+                <ul class="rclist">
+                    <template v-if="my_task == 'None' "><nobr><div class="time task_list">暂无数据</div></nobr></template>
+{#                    <template v-if="my_task.data == 'None' "><nobr><div class="time task_list">暂无数据</div></nobr></template>#}
+                    <template v-else v-for="(value,index) in my_task.data">
+                        <li>
+                            <span class="time">开始时间:&nbsp&nbsp&nbsp[[value.start_date]]</span></br>
+                            <span class="task_list">任务名称:&nbsp&nbsp&nbsp[[value.task_name]]</span></br>
+                            <span class="task_list">主要负责人:&nbsp&nbsp&nbsp[[value.owner]]</span></br>
+                            <span class="task_list">关联名称:&nbsp&nbsp&nbsp[[value.content]]</span></br>
+                            <span class="task_list">截止时间:&nbsp&nbsp&nbsp[[value.finish_date]]</span></br>
+                            <span class="task_list">任务状态:&nbsp&nbsp&nbsp[[value.status]]</span>
+                            <HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#DCDCDC SIZE=5>
+                        </li>
+                    </template>
+                </ul>
+                <!--<a class="downBtn" href="#" style="display:none;">显示更多</a>-->
+            </div>
+        </div>
+    </div>
+
+	<!-- 弹窗 -->
+	<div class="dialog" id="add_task_div">
+		<div class="dialog_container">
+			<div class="dialog_title flex_v_center"><span>任务</span><span class="dialog_close">&times;</span></div>
+			<div class="doalog_content">
+				<div class="dialog_list flex_verticle">
+					<span class="dialog_list_name">任务名称</span>
+					<input id="task_name" type="text" class="dialog_list_input border_box flex_1" placeholder="请输入任务名称"/>
+				</div>
+				<div class="dialog_list flex_verticle">
+					<span class="dialog_list_name">开始时间</span>
+					<input type="text" class="dialog_list_input border_box flex_1" placeholder="请输入开始时间"  id="bTime" data-options="{'type':'YYYY-MM-DD hh:mm','beginYear':2010,'endYear':2088}"/>
+				</div>
+				<div class="dialog_list flex_verticle">
+					<span class="dialog_list_name no_star">开始提醒</span>
+					<select class="dialog_list_select border_box flex_1" id="b_remind">
+                        <option value="3600">提前1个小时</option>
+                        <option value="21600">提前6个小时</option>
+                        <option value="86400">提前1天</option>
+                        <option value="172800">提前2天</option>
+					</select>
+				</div>
+				<div class="dialog_list flex_verticle">
+					<span class="dialog_list_name">截止时间</span>
+					<input type="text" class="dialog_list_input border_box flex_1" placeholder="请输入截止时间" id="eTime" data-options="{'type':'YYYY-MM-DD hh:mm','beginYear':2010,'endYear':2088}"/>
+				</div>
+				<div class="dialog_list flex_verticle">
+					<span class="dialog_list_name no_star">截止提醒</span>
+					<select class="dialog_list_select border_box flex_1" id="e_remind">
+                        <option value="86400">提前1天</option>
+                        <option value="3600">提前1个小时</option>
+                        <option value="21600">提前6个小时</option>
+                        <option value="172800">提前2天</option>
+					</select>
+				</div>
+				<div class="dialog_list flex_verticle">
+					<span class="dialog_list_name">负责人员</span>
+					<input type="text" id="ownerid" class="dialog_list_input border_box mian_user" placeholder="负责人"/>
+					<input type="text" id="member" class="dialog_list_input border_box other_user flex_1" placeholder="请输入或选填参与人"/>
+				</div>
+				<div class="dialog_list flex_verticle">
+					<span class="dialog_list_name no_star">关联业务</span>
+					<select class="dialog_list_select border_box business" id="blongid">
+						<option value="3">商机</option>
+						<option value="1">客户</option>
+					</select>
+					<input type="text" name="" id="entityObjectId" class="dialog_list_input border_box other_user flex_1" placeholder="请输入并选择"/>
+				</div>
+
+				<div class="dialog_list flex_verticle desc_box">
+					<span class="dialog_list_name no_star">详细描述</span>
+					<textarea id="description" class="dialog_list_textarea border_box flex_1"></textarea>
+					<p class="txt_tips">最多不超过500字</p>
+				</div>
+				<div class="dialog_list flex_verticle">
+					<div class="file_box border_box">
+{#						<span>&nbsp;+&nbsp;&nbsp;添加文件</span>#}
+{#						<input type="file" class="dialog_file"/>#}
+					</div>
+				</div>
+			</div>
+			<div class="doalog_btns_box">
+				<button class="cancle_btn">取消</button>
+				<button class="create_btn">新建任务</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- 推荐任务商机 -->
+	<h3 class="task_title ellipsis" id="mytask">推荐任务商机</h3>
+    <div class="task_content_box  border_box" id="opportunity">
+    </div>
+
+
+        <!-- 任务记录 -->
+    <div class="task_content_box  border_box">
+            <h3 class="task_title ellipsis">任务修改记录</h3>
+            <div class="task_list_box border_box" id="record">
+                <template v-if="modify_task == 'None' "><nobr><div class="list_title flex">暂无数据</div></nobr></template>
+                <template v-for="(value,index) in modify_task.data">
+                    <div class="list_title flex">[[value.operate_type]]</div>
+                    <div class="last_customer flex">操作人:[[value.operate_user]]</div>
+                    <div class="last_customer flex">修改字段:[[value.operate_field]]</div>
+                    <div class="last_customer flex">操作时间:[[value.operate_time]]</div>
+                    <div class="txt_left flex">操作内容:[[value.operate_content]]</div>
+                    <HR style="FILTER: alpha(opacity=100,finishopacity=0,style=2)" width="100%" color=#DCDCDC SIZE=5>
+                </template>
+            </div>
+    </div>
+
+
+<script src="{% static 'js/jquery.date.js' %}?version=0.0.1"></script>
+</div>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+{% block js_tail %}
+{% endblock %}

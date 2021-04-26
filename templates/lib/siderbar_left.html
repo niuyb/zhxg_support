@@ -1,0 +1,168 @@
+{% load static %}
+
+
+<script src="{% static 'js/npm/vue@2.6.11' %}"></script>
+<script src="{% static 'js/axios/dist/axios.min.js' %}"></script>
+<script src="{% static 'js/plugins/qs/qs.min.js' %}"></script>
+<!-- <script type="text/javascript" src="{% static 'js/sidebar.js' %}"></script> -->
+
+
+<!--左侧导航开始-->
+<nav class="navbar-default navbar-static-side" role="navigation">
+    <div class="nav-close"><i class="fa fa-cogs"></i>
+        <!-- <i class="fa fa-times-circle"></i> -->
+    </div>
+    <div class="sidebar-collapse">
+        <ul class="nav" id="side-menu">
+            <li class="nav-header">
+                <div class="dropdown profile-element">
+                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                        <span class="clear">
+                            <span class="block m-t-xs" style="font-size:20px;">
+                                <!-- <i class="fa fa-area-chart"></i> -->
+                                <i class="fa fa-cogs"></i>
+                                <strong class="font-bold">星光运营平台</strong>
+                                <!-- <small class="navbar-minimalize"><i class="fa fa-bars"></i></small> -->
+                            </span>
+                        </span> 
+                    </a>
+                </div>
+                <div class="logo-element">运营
+                </div>
+            </li>
+            <!-- <li v-for="child in modules" class="">
+                <a :href="child.url || 'javascript:;'">
+                    <i :class="'fa ' + child.icon "></i> 
+                    <template v-if="child.children.length > 0">
+                        <span class="nav-label">[[ child.name ]]</span> 
+                        <span class="fa arrow"></span>
+                    </template>
+                    <template v-else>
+                        [[ child.name ]]
+                    </template>
+                </a>
+                <ul v-if="child.children.length > 0" class="nav nav-second-level">
+                    <li v-for="child2 in child.children">
+                        <a class="" :href="child2.url || 'javascript:;'">
+                            <i :class="'fa ' + child2.icon"></i>
+                            <template v-if="child2.children.length > 0">
+                                <span class="nav-label">[[ child2.name ]]</span> 
+                                <span class="fa arrow"></span>
+                            </template>
+                            <template v-else>
+                                [[ child2.name ]]
+                            </template>
+                        </a>
+                        <ul v-if="child2.children.length > 0" class="nav nav-third-level">
+                            <li v-for="child3 in child2.children">
+                                <a class="" :href="child3.url || 'javascript:;'">
+                                    <i :class="'fa ' + child3.icon"></i>
+                                    <template v-if="child3.children.length > 0">
+                                        <span class="nav-label">[[ child3.name ]]</span> 
+                                        <span class="fa arrow"></span>
+                                    </template>
+                                    <template v-else>
+                                        [[ child3.name ]]
+                                    </template>
+                                </a>
+                                <ul v-if="child3.children.length > 0" class="nav nav-fourth-level">
+                                    <li v-for="child4 in child3.children">
+                                        <a class="" :href="child4.url || 'javascript:;'">
+                                            <i class="'fa ' + child4.icon"></i>
+                                            <template v-if="child4.children.length > 0">
+                                                <span class="nav-label">[[ child4.name ]]</span> 
+                                                <span class="fa arrow"></span>
+                                            </template>
+                                            <template v-else>
+                                                [[ child4.name ]]
+                                            </template>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li> -->
+
+            {% for child in request.modules %}
+                <li class="">
+                    <a href="{% if child.url %}{{ child.url }}{% else %}javascript:;{% endif %}">
+                        <i class="fa {{ child.icon }}"></i> 
+                        <span class="nav-label">{{ child.name }} </span> 
+                        <span class="fa arrow"></span>
+                    </a>
+                    {% if child.children %}
+                        <ul class="nav nav-second-level">
+                            {% for child2 in child.children %}
+                                <li>
+                                    <a class="" href="{% if child2.url %}{{ child2.url }}{% else %}javascript:;{% endif %}">
+                                        <i class="fa {{ child2.icon }}"></i>
+                                        {{ child2.name }}
+                                    </a>
+                                    {% if child2.children %}
+                                        <ul class="nav nav-third-level">
+                                            {% for child3 in child2.children %}
+                                                <li>
+                                                    <a class="" href="{% if child3.url %}{{ child3.url }}{% else %}javascript:;{% endif %}">
+                                                        <i class="fa {{ child3.icon }}"></i>
+                                                        {{ child3.name }}
+                                                    </a>
+                                                    <ul class="nav nav-fourth-level">
+                                                        {% for child4 in child3.children %}
+                                                            <li>
+                                                                <a class="" href="{% if child4.url %}{{ child4.url }}{% else %}javascript:;{% endif %}">
+                                                                    <i class="fa {{ child4.icon }}"></i>
+                                                                    {{ child4.name }}
+                                                                </a>
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </li>
+            {% endfor %}
+
+        </ul>
+    </div>
+</nav>
+<!-- <script>
+    var sidebar = new Vue({
+        el: "#side-menu",
+        delimiters: ["[[", "]]"],
+        data(){
+            return {
+                modules: [],
+            }
+        },
+        methods: {
+            getModules(){
+                let self = this;
+                let url = "/xman/module/tree/api";
+                axios.get(url).then(res => {
+                    if (res.data.code === 1){
+                        self.modules = res.data.data;
+                        setTimeout(sidebarFunc, 2000);
+                        menuClick();
+                    }else{
+                        // self.$message.error("导航栏数据获取失败，请刷新页面");
+                        console.log("导航栏数据获取失败，请刷新页面");
+                    }
+                }).catch(err => {
+                    //self.$message.error(err);
+                    console.log(err);
+                })
+            }
+        },
+        created(){
+            this.getModules();
+        }
+    });
+</script> -->
+<!--左侧导航结束-->

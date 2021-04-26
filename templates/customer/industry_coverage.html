@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block css_tail %}
+<!-- jqgrid-->
+<link href="{% static 'css/plugins/jqgrid/ui.jqgrid.css' %}" rel="stylesheet">
+<link href="{% static 'css/plugins/datapicker/datepicker3.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<script>
+
+</script>
+<div style="display: none;">
+    <div id="department-data">{{ industry_data }}</div>
+    <div id="department-data-1">{{ industry_data_1 }}</div>
+    <div id="industry-coverage-api">{% url 'customer:industry_coverage_api' %}</div>
+    <div id="fields-to-check">{{ fields_to_check }}</div>
+</div>
+<div class="row">
+    <div class="col-sm-12">
+        <div style="margin-top: 10px;"></div>
+        <div class="ibox float-e-margins" style="margin-bottom: 10px;">
+            <div class="ibox-content">
+                <form method="GET" onsubmit="return false;" class="form-horizontal" id="industry-coverage-filter-form">
+                    <!-- {% csrf_token %} -->
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <div class="col-lg-2 col-md-2, col-sm-3" style="margin-top: 5px; display: none;">
+                                <input name="industry" id="department-value" />
+                            </div>
+                            <div class="col-lg-2 col-md-2, col-sm-3" id="id_department-1" style="margin-top: 5px;">
+                                <label><nobr>一级行业：</nobr></label>
+                                <select type="text" class="form-control" id="department-1" name="industry1" onchange="onDepartmentChange1()" style="padding-top: 2px;"></select>
+                            </div>
+                            <div class="col-lg-2 col-md-2, col-sm-3" id="id_department-2" style="margin-top: 5px; display: none;">
+                                <label><nobr>二级行业:</nobr></label>
+                                <select type="text" class="form-control" id="department-2" name="industry2" style="padding-top: 2px;"></select>
+                            </div>
+                            <div class="col-lg-2 col-md-2, col-sm-3" style="margin-top: 5px;" id="id_province">
+                                <!-- <label>客户地域-省：</label> -->
+                                <label><nobr>客户地域：</nobr></label>
+                                <!-- <select type="text" class="form-control" name="customer_province"></select> -->
+                                {{ form.location }}
+                            </div>
+                            <div class="col-lg-2 col-md-2, col-sm-3" style="margin-top: 5px; display: none;" id="id_city">
+                                <label><nobr>客户地域-市：</nobr></label>
+                                <!-- <select type="text" class="form-control" name="customer_city"></select> -->
+                                {{ form.customer_city }}
+                            </div>
+                            <div class="col-lg-2 col-md-2, col-sm-3" style="margin-top: 5px; display: none;" id="id_county">
+                                <label><nobr>客户地域-县：</nobr></label>
+                                <!-- <select type="text" class="form-control" name="customer_county"></select> -->
+                                {{ form.customer_county }}
+                            </div>
+                            <div class="col-lg-2 col-md-2, col-sm-3" style="float: right; margin-top: 5px;">
+                                <label></label>
+                                <div>                                        
+                                    <button class="btn btn-primary col-md-6" type="submit" id="submitBtn">搜索</button>
+                                    <button class="btn btn-white col-md-3" type="reset" style="float: right;" id="resetBtn">重置</button>
+                                </div>
+                            </div>
+                            <div style="clear: both;"></div>
+                        </div>
+                        
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="ibox ">
+            <div class="ibox-content">
+
+                <div class="jqGrid_wrapper">
+                    <table id="table_list_1"></table>
+                    <div id="pager_list_1"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="init-data" style="display: none;">{{ init_data }}</div>
+{% endblock %}
+
+{% block js_tail %}
+    <!-- Peity -->
+    <script src="{% static 'js/plugins/peity/jquery.peity.min.js' %}"></script>
+
+    <!-- jqGrid -->
+    <script src="{% static 'js/plugins/jqgrid/i18n/grid.locale-cn.js' %}"></script>
+    <script src="{% static 'js/plugins/jqgrid/jquery.jqGrid.min.js' %}"></script>
+    <script src="{% static 'js/content.js' %}"></script>
+    <script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+    <script src="{% static 'js/plugins/jsKnob/jquery.knob.js' %}"></script>
+    <script src="{% static 'js/plugins/datapicker/bootstrap-datepicker.js' %}"></script>
+    <script src="{% static 'js/plugins/ionRangeSlider/ion.rangeSlider.min.js' %}"></script>
+    <script src="{% static 'js/customer/industry_coverage_list.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,166 @@
+{% extends 'work_platform/base.html' %}
+{% load i18n static %}
+
+{% block css_head %}
+
+<link rel="stylesheet" href="{% static 'css/npm/vant@2.9/lib/index.css' %}" />
+<link href="{% static 'css/WorkPlatform/list.css' %}?version=1.1.2" rel="stylesheet">
+
+{% endblock %}
+
+{% block js_head %}
+
+<script src="{% static 'js/npm/vue/dist/vue.min.js' %}"></script>
+<script src="{% static 'js/axios/dist/axios.min.js' %}"></script>
+<script src="{% static 'js/npm/vant@2.9/lib/vant.min.js' %}"></script>
+<script src="{% static 'js/plugins/qs/qs.min.js' %}"></script>
+
+{% endblock %}
+
+{% block body %}
+    <style>
+        .flex-item{
+            font-size: .36rem;
+            color: #707070;
+            height: .50rem;
+        }
+        .tools{
+            height: .80rem;
+            border-bottom: solid 1px lightgray;
+        }
+        .van-field{
+            height: .60rem;
+            font-size: .24rem;
+        }
+        .van-field input{
+            margin-top: -.1rem;
+        }
+        .van-dialog{
+            font-size: .24rem;
+            line-height: .24rem;
+        }
+        [v-cloak]{
+            display: none;
+        }
+    </style>
+    <div style="display: none;">
+        <span id="data-api">{{ data_api }}</span>
+    </div>
+    <div v-cloak id="app">
+        {% block head_options %}
+            <div class="title">
+                <div id="sidebar-btn" class="head-icon"><img  @click="toSidebar" src="/static/img/hamburg64.png" /></div>
+                <span v-if="show_back_btn" id="back" class="head-icon" style="margin-left: .30rem;float: left;" @click="toback">
+                    <img src="/static/img/back.png"/>
+                </span>
+                <!-- <div id="refresh-btn" class="head-icon"><img  onclick="messager.error('刷新，开发中！');" src="/static/img/refresh48.png" /></div> -->
+                <!-- <div id="top-opts"><h1>{{ title }}</h1></div> -->
+                <div id="top-opts" class="head-icon">
+                    <van-dropdown-menu v-if="power && JSON.stringify(power) !== '{}'">
+                        <van-dropdown-item  v-model="power.result" :options="power.options" /></van-dropdown-item>
+                    </van-dropdown-menu>
+                    <span v-else>{{ title }}</span>
+                </div>
+                <div id="tools">
+                    <span v-if="show_sort_btn" id="sort" class="head-icon">
+                        <img @click="toSort" src="/static/img/sort64-white.png" />
+                    </span>
+                    <span v-if="show_filter_btn" id="filter" class="head-icon">
+                        <!-- <img onclick="messager.error('筛选，开发中！');" src="/static/img/filter64-white.png" /> -->
+                        <img @click="toFilt" src="/static/img/filter64-white.png" />
+                    </span>
+                    <span v-if="show_search_btn" id="search" class="head-icon">
+                        <img @click="toSearch" src="/static/img/search64-white.png" />
+                    </span>
+                    <span v-if="show_add_btn" id="add" class="head-icon">
+                        <img  @click="toAdd" src="/static/img/add64-white.png" />
+                    </span>
+                    <span id="refresh">
+                        <img  @click="refresh" src="/static/img/refresh48.png" />
+                    </span>
+                </div>
+                <div style="display: none; clear: both;"></div>
+            </div>
+            <div style="clear: both;"></div>
+            <div id="conditions"></div>
+
+        {% endblock %}
+
+        <div id="data-items">
+        {% block Filter%}
+            <van-popup 
+                id="filtersPopup"
+                v-model="showSorters"
+                position="top">
+                <template
+                    v-for="column in columns">
+                    <van-cell 
+                        @click="onSort(column)"
+                        v-if="column.sortBy !== null"
+                        center 
+                        :title="column.label">
+                        <template #right-icon>
+                            <template v-if="column.sortBy === 'asc'">
+                                <van-icon name="ascending"></van-icon>
+                            </template>
+                            <template v-else-if="column.sortBy === 'desc'">
+                                <van-icon name="descending"></van-icon>
+                            </template>
+                        </template>
+                    </van-cell>
+                </template>
+            </van-popup>
+            <van-popup 
+                v-model="showFilters" 
+                position="right" 
+                :style="{ width: '80%', height: '100%' }"
+                >
+                <van-form @submit="onFilt" id="filtForm" :style="{'margin': '.30rem', height: '100%'}">
+                    <div v-cloak style="height: 90%; overflow: scroll;">
+                        <template v-for="column in columns">
+                            <template v-if="column.filter">
+                                <template v-if="column.filter.options && column.filter.options.length > 0">
+                                    <van-field 
+                                        :name="column.name" 
+                                        :label="column.label + '：'" 
+                                        style="height: auto;">
+                                        <template #input>
+                                            <van-checkbox-group v-model="column.filter.result" :disabled="column.disabled" direction="horizontal">
+                                                <template v-for="option in column.filter.options">
+                                                    <van-checkbox :name="option.value" shape="round">[[ option.label ]] </van-checkbox>
+                                                </template>
+                                            </van-checkbox-group>
+                                        </template>
+                                    </van-field>
+                                </template>
+                                <template v-else>
+                                    <van-field 
+                                        v-model="column.filter.result"
+                                        :name="column.name"
+                                        :label="column.label + '：'">
+                                    </van-field>
+                                </template>
+                            </template>
+                        </template>
+                    </div>
+                    <div v-cloak style=" margin-bottom: .20rem; height: 10%;">
+                        <van-button type="danger" @click.prevent="resetFilt" style="width: 30%;">
+                          重置
+                        </van-button>
+                        <van-button type="info" native-type="submit" style="width: 60%;">
+                          提交
+                        </van-button>
+                    </div>
+                </van-form>
+            </van-popup>
+            {% endblock %}
+            {% block data_items %}
+
+            {% endblock %}
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js_tail %}
+{% endblock %}

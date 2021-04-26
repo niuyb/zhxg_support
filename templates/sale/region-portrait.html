@@ -1,0 +1,419 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block css_tail %}
+<!-- <link rel="stylesheet" href="https://unpkg.com/element-ui@2.13.1/lib/theme-chalk/index.css"> -->
+<link rel="stylesheet" href="{% static 'css/element-ui@2.13.1/lib/theme-chalk/index.css' %}">
+{% endblock %}
+
+{% block body %}
+<script src="{% static 'js/plugins/echarts/echarts-all.js' %}"></script>
+<script src="{% static 'js/plugins/echarts/echarts.min.js' %}"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
+
+<script src="{% static 'js/npm/vue@2.6.11' %}"></script>
+<script src="{% static 'js/axios/dist/axios.min.js' %}"></script>
+<!-- <script src="https://unpkg.com/element-ui@2.13.1/lib/index.js"></script> -->
+<script src="{% static 'js/element-ui@2.13.1/lib/index.js' %}"></script>
+<div style="display: none;">
+    <div id="department-api">{{ departments_api }}</div>
+</div>
+<style>
+    .padding-5{
+        padding: 5px 5px;
+    }
+    .mbt-10{
+        margin-bottom: 10px;
+    }
+    .mbt-0{
+        margin-bottom: 0px;
+    }
+    .mr-5{
+        margin-right: 5px;
+    }
+</style>
+<div class="row">
+    <div class="col-md-6 col-lg-3 padding-5">
+        <div class="ibox float-e-margins mbt-0" style="height: 280px;">
+            <div class="ibox-title">
+                <h5 style="width: 100%; text-align: center;">大区信息</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content">
+                <div id="region-info">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td style="border-top-style: none;">部门：</td>
+                                <td style="border-top-style: none;"><h5><nobr>[[ department.name ]]</nobr></h5></td>
+                            </tr>
+                            <tr>
+                                <td><nobr>级别：</nobr></td>
+                                <td><template v-if="department.level == 1">大区</template><template v-else-if="department.level == 2">省域</template></td>
+                            </tr>
+                            <tr>
+                                <td><nobr>负责人：</nobr></td>
+                                <td><a :href="'/sale/portrait/saler?uid=' + department.manager.uid">[[ department.manager.name ]]</a></td>
+                            </tr>
+                            <tr>
+                                <td><nobr>下属部门：</nobr></td>
+                                <td>
+                                    <a class="mr-5" v-for="child in department.children" :href="'/sale/portrait/department?did=' + child.value">[[ child.name ]]</a>
+                                    <!-- <a class="mr-5">山东</a>
+                                    <a class="mr-5">浙江</a>
+                                    <a>江苏</a> -->
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="col-md-6 col-lg-3 padding-5">
+        <div class="ibox float-e-margins mbt-0" style="height: 280px;">
+            <div class="ibox-title">
+                <h5 style="width: 100%; text-align: center;">大区阵地</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content" style="width: 100%; height: 85%;">
+                <div id="china-map" style="width: 100%; height: 100%;"></div>
+            </div>
+        </div>
+    </div> -->
+    <div class="col-md-6 col-lg-9 padding-5">
+        <div class="ibox float-e-margins mbt-0" style="height: 280px;">
+            <div class="ibox-title">
+                <h5 style="width: 100%; text-align: center;">大区架构</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content" style="width: 100%; height: 85%;">
+                <div id="region-tree" style="width: 100%; height: 100%;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12 padding-5">
+        <div class="ibox float-e-margins mbt-0" style="height: 280px;">
+            <div class="ibox-title">
+                <h5 style="width: 100%; text-align: center;">各部门目标完成情况</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content" style="width: 100%; height: 85%;">
+                <div id="goal-departments-month" style="width: 100%; height: 100%;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12 padding-5">
+        <div class="ibox float-e-margins mbt-0" style="height: 280px;">
+            <div class="ibox-title">
+                <h5 style="width: 100%; text-align: center;">日常拜访情况</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content" style="width: 100%; height: 85%;">
+                <div id="work-daily" style="width: 100%; height: 100%;">
+                    <div>
+                        <el-date-picker
+                            size="mini"
+                            v-model="month"
+                            format="yyyy年MM月"
+                            value-format="yyyy/M"
+                            type="month"
+                            :disabled="disabled"
+                            placeholder="选择月">
+                        </el-date-picker>
+                    </div>
+                    <div id="work-daily-chart" style="width: 100%; height: 100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="col-md-12 padding-5">
+        <div class="ibox float-e-margins mbt-0" style="height: 280px;">
+            <div class="ibox-title" style="border-bottom:none;background:#fff;">
+                <h5 style="width: 100%; text-align: center;">商务日常</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content" style="width: 100%; height: 85%;">
+                <div id="about-salers-work-daily" style="width: 100%; height: 100%;">
+                    <template>
+                        <el-table
+                            v-loading="loading"
+                            element-loading-text="loading"
+                            show-summary
+                            :data="tableData"
+                            :row-style="rowStyle"
+                            :height="200"
+                            border>
+                            <el-table-column
+                                prop="saler"
+                                label="商务">
+                            </el-table-column>
+                            <el-table-column
+                                prop="depart"
+                                :filters="departFilters"
+                                :filter-method="filterDepart"
+                                filter-placement="bottom-end"
+                                label="部门">
+                            </el-table-column>
+                            <el-table-column
+                                prop="call"
+                                sortable
+                                label="电话拜访">
+                            </el-table-column>
+                            <el-table-column
+                                prop="visit"
+                                sortable
+                                label="签到拜访">
+                            </el-table-column>
+                            <el-table-column
+                                prop="record"
+                                sortable
+                                label="快速记录">
+                            </el-table-column>
+                            <el-table-column
+                                prop="total"
+                                sortable
+                                label="拜访总数">
+                            </el-table-column>
+                        </el-table>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div> -->
+    <div class="col-md-12 padding-5">
+        <div class="ibox float-e-margins mbt-0" style="height: 280px;">
+            <div class="ibox-title">
+                <h5 style="width: 100%; text-align: center;">账号情况</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content" style="width: 100%; height: 85%;">
+                <div id="about-account" style="width: 100%; height: 100%;">
+                    <template>
+                        <el-table
+                            :data="tableData"
+                            v-loading="loading"
+                            element-loading-text="loading"
+                            border>
+                            <el-table-column
+                                prop="product"
+                                label="产品">
+                            </el-table-column>
+                            <el-table-column
+                                prop="total"
+                                label="总数">
+                            </el-table-column>
+                            <el-table-column
+                                prop="formal"
+                                label="正式">
+                            </el-table-column>
+                            <el-table-column
+                                prop="trial"
+                                label="试用">
+                            </el-table-column>
+                            <el-table-column
+                                prop="stop"
+                                label="停用">
+                            </el-table-column>
+                            <el-table-column
+                                prop="drop"
+                                label="弃用">
+                            </el-table-column>
+                            <el-table-column
+                                prop="week_twice"
+                                label="周双活">
+                            </el-table-column>
+                            <el-table-column
+                                prop="week"
+                                label="周活跃">
+                            </el-table-column>
+                            <el-table-column
+                                prop="month"
+                                label="月活跃">
+                            </el-table-column>
+                            <el-table-column
+                                prop="three_months"
+                                label="连续三月活跃">
+                            </el-table-column>
+                            <el-table-column
+                                prop="dead"
+                                label="零活跃">
+                            </el-table-column>
+                            <el-table-column
+                                prop="trial_three_months_high"
+                                label="试用高活三个月">
+                            </el-table-column>
+                        </el-table>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 padding-5">
+        <div class="ibox float-e-margins mbt-0" style="height: 280px;">
+            <div class="ibox-title">
+                <h5 style="width: 100%; text-align: center;">商机情况</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content" style="width: 100%; height: 85%;">
+                <div id="about-opportunity">
+                    <template>
+                        <el-table
+                            :data="tableData"
+                            v-loading="loading"
+                            element-loading-text="loading"
+                            border>                            
+                            <el-table-column
+                                prop="total"
+                                label="总数">
+                            </el-table-column>
+                            <el-table-column
+                                prop="new"
+                                label="新建">
+                            </el-table-column>
+                            <el-table-column
+                                prop="no_account"
+                                label="未创建账号">
+                            </el-table-column>
+                            <el-table-column
+                                prop="stop_three_months"
+                                label="商机停留三个月">
+                            </el-table-column>
+                        </el-table>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 padding-5">
+        <div class="ibox float-e-margins mbt-0" style="height: 280px;">
+            <div class="ibox-title">
+                <h5 style="width: 100%; text-align: center;">客户情况</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content" style="width: 100%; height: 85%;">
+                <div id="about-customer">
+                    <template>
+                        <el-table
+                            :data="tableData"
+                            v-loading="loading"
+                            element-loading-text="loading"
+                            border>
+                            <el-table-column
+                            prop="total"
+                            label="总数">
+                            </el-table-column>
+                            <el-table-column
+                            prop="formal"
+                            label="正式">
+                            </el-table-column>
+                            <el-table-column
+                            prop="important"
+                            label="重点">
+                            </el-table-column>
+                            <el-table-column
+                            prop="new"
+                            label="新开发">
+                            </el-table-column>
+                        </el-table>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="col-md-6 padding-5">
+        <div class="ibox float-e-margins mbt-0" style="height: 280px;">
+            <div class="ibox-title">
+                <h5 style="width: 100%; text-align: center;">舆情秘书账号情况</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content" style="width: 100%; height: 85%;">
+                <div id="about-account-yqms" style="width: 100%; height: 100%;"></div>
+            </div>
+        </div>
+    </div> -->
+    <!-- <div class="col-md-6 padding-5">
+        <div class="ibox float-e-margins mbt-0" style="height: 280px;">
+            <div class="ibox-title">
+                <h5 style="width: 100%; text-align: center;">态势感知账号情况</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content" style="width: 100%; height: 85%;">
+                <div id="about-account-tsgz" style="width: 100%; height: 100%;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 padding-5">
+        <div class="ibox float-e-margins mbt-0" style="height: 280px;">
+            <div class="ibox-title">
+                <h5 style="width: 100%; text-align: center;">智慧网评账号情况</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content" style="width: 100%; height: 85%;">
+                <div id="about-account-zhwp" style="width: 100%; height: 100%;"></div>
+            </div>
+        </div>
+    </div> -->
+    <!-- <div class="clearfix" style="display: none;"></div>
+</div>
+<div class="row"> -->
+    <!-- <div class="clearfix" style="display: none;"></div>
+</div>
+<div class="row" style="margin-bottom: 30px;"> -->
+    <!-- <div class="col-md-6 col-lg-3 padding-5">
+        <div class="ibox float-e-margins mbt-10" style="height: 280px;">
+            <div class="ibox-title">
+                <h5 style="width: 100%; text-align: center;">客户总量</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content" style="width: 100%; height: 85%;">
+                <div id="customer-count" style="width: 100%; height: 100%;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3 padding-5">
+        <div class="ibox float-e-margins mbt-10" style="height: 280px;">
+            <div class="ibox-title">
+                <h5 style="width: 100%; text-align: center;">客户行业</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content" style="width: 100%; height: 85%;">
+                <div id="customer-industry" style="width: 100%; height: 100%;"></div>
+            </div>
+        </div>
+    </div> -->
+    <div class="clearfix" style="display: none;"></div>
+</div>
+<div id="init-data" style="display: none;">{{ init_data }}</div>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+{% block js_tail %}
+    <!-- Peity -->
+    <script src="{% static 'js/plugins/peity/jquery.peity.min.js' %}"></script>
+    <script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+
+    <!-- JSKnob -->
+    <script src="{% static 'js/plugins/jsKnob/jquery.knob.js' %}"></script>
+    <script src="{% static 'js/plugins/datapicker/bootstrap-datepicker.js' %}"></script>
+    <script src="{% static 'js/plugins/ionRangeSlider/ion.rangeSlider.min.js' %}"></script>
+    <script src="{% static 'js/plugins/echarts/china.js' %}"></script>
+    <!-- <script src="{% static 'js/sale/department-portrait/region-portrait.html.js' %}"></script> -->
+    <!-- <script src="{% static 'js/sale/department-portrait/dpt-tree.js' %}"></script> -->
+    <script src="{% static 'js/sale/portrait.js' %}"></script>
+    <script src="{% static 'js/sale/region-portrait.js' %}"></script>
+    <!-- <script src="{% static 'js/sale/department-portrait/china-map.js' %}"></script> -->
+    <!-- <script src="{% static 'js/sale/saler-portrait/customer-count.js' %}"></script> -->
+    <!-- <script src="{% static 'js/sale/saler-portrait/work-daily.js' %}"></script> -->
+    <!-- <script src="{% static 'js/sale/saler-portrait/money-day.js' %}"></script> -->
+    <!-- <script src="{% static 'js/sale/saler-portrait/customer-industry.js' %}"></script> -->
+    <!-- <script src="{% static 'js/sale/department-portrait/p-r-ms.js' %}"></script>
+    <script src="{% static 'js/sale/department-portrait/p-r-ds.js' %}"></script>
+    <script src="{% static 'js/sale/department-portrait/a-dpts.js' %}"></script>
+    <script src="{% static 'js/sale/department-portrait/about-customer.js' %}"></script>
+    <script src="{% static 'js/sale/department-portrait/about-account.js' %}"></script>
+    <script src="{% static 'js/sale/department-portrait/about-opportunity.js' %}"></script> -->
+{% endblock %}

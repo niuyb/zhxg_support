@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block css_tail %}
+<!-- jqgrid-->
+<link href="{% static 'css/plugins/jqgrid/ui.jqgrid.css' %}" rel="stylesheet">
+<link href="{% static 'css/plugins/datapicker/datepicker3.css' %}" rel="stylesheet">
+<link href="{% static 'css/salerVisit/visit.css' %}" rel="stylesheet">
+<link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css"/>
+{% endblock %}
+{% block body %}
+    <style>
+        a.navbar-minimalize.minimalize-styl-2.btn.btn-info {
+            color: #ffffff !important;
+            background-color: #19a9d5;
+            border-color: #189ec8;
+            border-radius: 3px;
+            padding: 4px 12px;
+            margin: 14px 5px 5px 20px;
+            font-size: 14px;
+            float: left;
+        }
+        h3.navbar-form-custom {
+            color: inherit;
+        }
+        button#map_submitBtn.btn.btn-primary.col-md-6.col-sm-6 {
+            margin-bottom: 5px;
+            color: #ffffff !important;
+            background-color: #7266ba;
+            border-color: #7266ba;
+            border-radius: 3px;
+            display: inline-block;
+            padding: 4px 12px;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.42857143;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+        button#map_resetBtn.btn.btn-white.col-md-5.col-sm-4{
+            float: right;
+            margin-bottom: 5px;
+            color: inherit;
+            border: 1px solid #d2d2d2;
+            border-radius: 3px;
+            text-decoration: none;
+            display: inline-block;
+            padding: 4px 12px;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.42857143;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            touch-action: manipulation;
+            cursor: pointer;
+        }
+
+    </style>
+    <div style="display: none;">
+        <div id="visit_detail-api">{% url 'salerVisit:api_select_visit' %}</div>
+        <div id="visit_detail-table">{% url 'salerVisit:visit_table' %}</div>
+        <div id="export_data">{% url 'salerVisit:export_visit_table' %}</div>
+        <div id="department-api">{{ departments_api }}</div>
+        <div id="department-data">{{ department_data }}</div>
+        <div id="department-data-1">{{ department_data_1 }}</div>
+
+    </div>
+    <div style="margin-top: 10px;"></div>
+    <div class="ibox float-e-margins" style="margin-bottom: 0px;">
+            <div class="ibox-content">
+                <form method="GET" onsubmit="return false;" class="form-horizontal" id="visit-filter-form">
+                    <!-- {% csrf_token %} -->
+                    <div class="form-group">
+                        <div class="col-sm-12">
+
+                            <div class="col-lg-2 col-md-2 col-sm-3" style="margin-top: 5px; display: none;">
+{#                                <input name="department" id="department-value" />#}
+{#                                {{ form.department }}#}
+                                <input type="text" style="display: none;"  class="form-control" id="department-value" name="department"
+                                       disabled="disabled" value=""/>
+                                <input type="text"  class="form-control" id="department-value0" name="department"
+                                       value="{% if form.department.value %}{{ form.department.value }}{% else %}{{ form.department.field.value }}{% endif %}"/>
+
+                            </div>
+                            <!-- <br><br><br><br> -->
+                            <div class="col-lg-1 col-md-2 col-sm-3" id="id_department-1" style="margin-top: 5px;padding-left: 0;">
+                                <label>部门：</label>
+                                <select type="text" class="form-control" id="department-1" onchange="onDepartmentChange1()" style="padding-top: 2px;"></select>
+                            </div>
+                            <div class="col-lg-1 col-md-2 col-sm-3" id="id_department-2" style="margin-top: 5px; display: none;padding-left: 0px;">
+                                <label>二级部门:</label>
+                                <select type="text" class="form-control" id="department-2" onchange="onDepartmentChange2()" style="padding-top: 2px;"></select>
+                            </div>
+                            <div class="col-lg-1 col-md-2 col-sm-3" id="id_department-3" style="margin-top: 5px; display: none;padding-left: 0px;">
+                                <label>三级部门:</label>
+                                <select type="text" class="form-control" id="department-3" onchange="onDepartmentChange3()" style="padding-top: 2px;"></select>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-3" id="id_department-4" style="margin-top: 5px; display: none;">
+                                <label>四级部门:</label>
+                                <select type="text" class="form-control" id="department-4" onchange="onDepartmentChange4()" style="padding-top: 2px;"></select>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-3" id="id_department-5" style="margin-top: 5px; display: none;">
+                                <label>五级部门:</label>
+                                <select type="text" class="form-control" id="department-5" onchange="onDepartmentChange5()" style="padding-top: 2px;"></select>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-3" id="id_department-6" style="margin-top: 5px; display: none;">
+                                <label>六级部门:</label>
+                                <select type="text" class="form-control" id="department-6" onchange="onDepartmentChange6()"></select>
+                            </div>
+                            <div class="col-md-2 col-sm-2" id="id_department-7" style="margin-top: 5px; display: none;">
+                                <label>七级部门:</label>
+                                <select type="text" class="form-control" id="department-7" onchange="onDepartmentChange7()"></select>
+                            </div>
+                            <div class="col-md-1 col-sm-2" id="id_department-8" style="margin-top: 5px; display: none;">
+                                <label>八级部门:</label>
+                                <select type="text" class="form-control" id="department-8" onchange="onDepartmentChange8()"></select>
+                            </div>
+                            <div class="col-md-1 col-sm-2" id="id_department-9" style="margin-top: 5px; display: none;">
+                                <label>九级部门:</label>
+                                <select type="text" class="form-control" id="department-9" onchange="onDepartmentChange9()"></select>
+                            </div>
+                            <div class="col-md-1 col-sm-2" id="id_department-10" style="margin-top: 5px; display: none;">
+                                <label>十级部门:</label>
+                                <select type="text" class="form-control" id="department-10" onchange="onDepartmentChange10()"></select>
+                            </div>
+                            <div class="col-lg-1 col-md-2 col-sm-4" style="margin-top: 5px;padding-right: 20px;padding-left: 0px;">
+                                <label>商务：</label>
+                                <input type="text" style="display: none;"  class="form-control" placeholder="模糊查询" id="saler_name" name="saler"
+                                       disabled="disabled" value=""/>
+                                <input type="text"  class="form-control" placeholder="模糊查询" id="saler_name0" name="saler"
+                                       value="{% if form.saler.value %}{{ form.saler.value }}{% else %}{{ form.saler.field.value }}{% endif %}"/>
+                            </div>
+
+                            <div class="col-lg-3 col-md-4 col-sm-6" id="data_5" style="margin-top: 5px;padding-right: 20px;padding-left: 0px;">
+                                <label>签到日期：</label>
+                                <div class="input-daterange input-group" id="datepicker6">
+                                    <input type="text" class="input-sm form-control" name="activity_start" style="width: 100%;"
+                                            value="{% if form.activity_start.value %}{{ form.activity_start.value }}{% else %}{{ form.activity_start.field.value }}{% endif %}" />
+                                    <span class="input-group-addon" style="width: 10%;">至</span>
+                                    <input type="text" class="input-sm form-control" name="activity_finish" style="width: 100%;"
+                                            value="{% if form.activity_finish.value %}{{ form.activity_finish.value }}{% else %}{{ form.activity_finish.field.value }}{% endif %}" />
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-3" style="margin-top: 5px;padding-left: 0px; ">
+                                <label>签到问题：</label>
+                                {{ form.problem_type }}
+
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-sm-6" style="float: right; margin-top: 5px;">
+                                <label></label>
+                                <div>
+                                    <button class="btn btn-primary col-md-6 col-sm-6" type="submit" id="map_submitBtn">搜索</button>
+                                    <button class="btn btn-white col-md-5 col-sm-4" style="float: right; margin-left: 3px;" type="reset"  id="map_resetBtn">重置</button>
+                                </div>
+                            </div>
+                            <div style="clear: both;"></div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    <div id="left_body" class="evenAna_map">
+        <div class="event_content">
+            <div id="map" class="event" >
+                <div class="event_text">
+                    <p>
+                        签到数据
+                        <span id="export" onclick="exportDataToExcel()" title="导出为excel" style="margin-left: 15px;cursor:pointer">
+                            <span id="export_condition" style="display: none;"></span>
+                            {% if perms.salerVisit_visit_table.export %}
+                                <img src={% static "/img/export.png" %} >
+                                <span style="font-size: 12px;color: #515151;">导出</span>
+                            {% endif %}
+                        </span>
+
+                    </p>
+                </div>
+
+                <div class="jqGrid_wrapper" style="padding-left: 10px;padding-right: 5px;">
+                    <table id="table_list_1"></table>
+                    <div id="pager_list_1"></div>
+                </div>
+
+
+        </div>
+    </div></div>
+    <div id="right_body" class="evenAna_sort">
+        <div class="event_content">
+
+            <div id="visit_detail" class="event a" style="height: 750px;">
+                <div class="event_text">
+                    <p>个人签到排名</p>
+                </div>
+                <div id="timeline" style="overflow: scroll;height: 95%;">
+                    <ul id="staff_visit_detail" class="ul">
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="init-data" style="display: none;">{{ init_data }}</div>
+
+
+{% endblock %}
+
+{% block js_tail %}
+    <!-- Peity -->
+    <script src="{% static 'js/plugins/peity/jquery.peity.min.js' %}"></script>
+        <!-- jqGrid -->
+    <script src="{% static 'js/plugins/jqgrid/i18n/grid.locale-cn.js' %}"></script>
+    <script src="{% static 'js/plugins/jqgrid/jquery.jqGrid.min.js' %}"></script>
+    <script src="{% static 'js/plugins/echarts/echarts.js' %}"></script>
+    <script src="{% static 'js/salerVisit/visit_table.js' %}"></script>
+    <script src="{% static 'js/plugins/echarts/china.js' %}"></script>
+    <script src="{% static 'js/plugins/datapicker/bootstrap-datepicker.js' %}"></script>
+{% endblock %}
+

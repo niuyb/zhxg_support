@@ -1,0 +1,55 @@
+.top-row {
+    margin-top: 10px;
+}
+.contact-box {
+    margin-bottom: 10px;
+}
+.ibox {
+    margin-bottom: 10px;
+}
+.card {
+    /* margin-bottom: 1.875em; */
+    border-radius: 5px;
+    padding: 0;
+    border: 0px solid transparent;
+    -webkit-box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+    background-color: #ffffff;
+    font-family: sans-serif;
+    font-size: 16px;
+}
+.card .card-body {
+    float: left;
+    padding: 1em;
+    position: relative;
+    width: 100%;
+}
+.stat-widget-five {
+    min-height: 50px;
+}
+.stat-icon {
+    font-size: 50px;
+    line-height: 50px;
+    position: absolute;
+    left: 30px;
+    top: 13px;
+}
+.dib {
+    display: inline-block;
+}
+.flat-color-1 {
+    color: #00c292;
+}
+.flat-color-2 {
+    color: #ab8ce4;
+}
+.flat-color-3 {
+    color: #03a9f3;
+}
+.flat-color-4 {
+    color: #fb9678;
+}
+.stat-content {
+    margin-left: 100px;
+    /* margin-top: 5px; */
+}

@@ -1,0 +1,148 @@
+{% extends 'work_platform/base.html' %}
+{% load i18n static %}
+
+{% block js_head %}
+    <script src="https://g.alicdn.com/dingding/dingtalk-jsapi/2.7.13/dingtalk.open.js"></script>
+    <!-- <script src="{% static 'js/work_platform/dingtalk.open.js' %}?version=1.0.5"></script> -->
+{% endblock %}
+
+{% block body %}
+<style>
+    .title{
+        margin-left: -.16rem;
+    }
+    .flex-container{
+        padding-top: .20rem;
+    }
+    .flex-item img{
+        width: 1.28rem;
+        height: 1.28rem;
+    }
+    #sidebar-btn{
+        margin-top: .14rem;
+        margin-right: .30rem;
+    }
+    #top-opts{
+        margin-top: .14rem;
+    }
+</style>
+    <div id="loading" style="width: 100%; margin-top: 50%; text-align: center;">
+        <div><img src="/static/img/loading.gif" /></div>
+        <div id="loading-text"></div>
+    </div>
+    
+{% endblock %}
+{% block js_tail %}
+    <script type="text/javascript">
+
+        // 从当前窗口链接中获取参数
+        function getUrlKey(name, url){
+            return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(url) || [, ""])[1].replace(/\+/g, '%20')) || null
+        }
+        
+        let url = "/is/logined";
+        $.get(url, function(res){
+            console.log(res);
+            if (res.code !== 1){
+                login()
+            }else{
+                history.back();
+            }
+        })
+
+        function login(){
+            var second = 120;
+            var message = `登录中`;
+            $("#loading-text").text(message);
+            const timer = setInterval(() => {
+                second--;
+                if (second){
+                    // if (second % 2 === 1){
+                    //     message = `登录中...`;
+                    // }else{
+                    //     message = `登录中`;
+                    // }
+                    $("#loading-text").text(message);
+                }else{
+                    clearInterval(timer);
+                    $("#loading").hide();
+                }
+            }, 1000);
+            
+            $(function () {
+                //钉钉sdk 初始化
+                // dd.ready参数为回调函数，在环境准备就绪时触发，jsapi的调用需要保证在该回调函数触发后调用，否则无效。
+                dd.ready(function () {
+                    //获取当前网页的url
+                    //http://ding-web.lnexin.cn/?corpid=ding46a9582af5b7541b35c2fxxxxxxxxxx8f
+                    var currentUrl = document.location.toString();
+        
+                    // 解析url中包含的corpId
+                    var corpId = currentUrl.split("corpid=")[1];
+                    if (!corpId){
+                        corpId = currentUrl.split("corpid%3D")[1];
+                    }
+                    if (!corpId){
+                        corpId = sessionStorage.getItem("corpId");
+                    }
+        
+                    //使用SDK 获取免登授权码
+                    dd.runtime.permission.requestAuthCode({
+                        corpId: corpId,
+                        onSuccess: function (result) {
+
+                            var code = result.code;
+                            var message = "";
+                            //请求我们服务端的登陆地址
+                            $.get("/ding_talk/login?code=" + code + "&corpId=" + corpId, function (response) {
+
+                                clearInterval(timer);
+                                $("#loading").hide();
+
+                                if (response.code === 1){
+                                    message = "登录成功！";
+
+                                    var sessionId = response.data.session_id;
+                                    // sessionStorage.setItem("sessionId", sessionId);
+
+                                    document.cookie = "sessionid=" + sessionId;
+
+                                    var next = getUrlKey(window.location.href);
+                                    if (!next){
+                                        next = "/work_platform/index"
+                                    }else{
+                                        next = decodeURIComponent(next);
+                                    }
+                                    
+                                    // window.location.href = next;
+
+                                    // next = "/work_platform/index2";
+
+                                    // if (next.indexOf("?") !== -1){
+                                    //     next += "&sessionId=" + sessionId;
+                                    // }else{
+                                    //     next += "?sessionId=" + sessionId;
+                                    // }
+
+                                    // // window.open(next);
+
+                                    window.location.href = next;
+                                    
+                                }else{
+                                    message = response.error;
+                                    messager.error(message);
+                                }
+                            });
+                        },
+                        onFail: function(error){
+                            clearInterval(timer);
+                            $("#loading").hide();
+
+                            messager.error(error);
+                        }
+                    });
+                });
+            });
+        }
+    </script>
+{% endblock %}

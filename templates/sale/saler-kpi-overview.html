@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block css_tail %}
+<!-- <link rel="stylesheet" href="https://unpkg.com/vue-easytable/umd/css/index.css">
+<link rel="stylesheet" href="https://unpkg.com/element-ui@2.13.1/lib/theme-chalk/index.css"> -->
+
+<link rel="stylesheet" href="{% static 'css/plugins/vue-easytable/umd/css/index.css' %}">
+<link rel="stylesheet" href="{% static 'css/element-ui@2.13.1/lib/theme-chalk/index.css' %}">
+
+<!-- <link rel="stylesheet" href="{% static 'css/plugins/vue-easytable/umd/css/v-checkbox-group.css' %}">
+<link rel="stylesheet" href="{% static 'css/plugins/vue-easytable/umd/css/v-search.css' %}"> -->
+{% endblock %}
+
+{% block body %}
+<!-- <script src="{% static 'js/plugins/echarts/echarts-all.js' %}"></script>
+<script src="{% static 'js/plugins/echarts/echarts.min.js' %}"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
+
+<script src="{% static 'js/npm/vue@2.6.11' %}"></script>
+<script src="{% static 'js/plugins/qs/qs.min.js' %}"></script>
+<script src="{% static 'js/axios/dist/axios.min.js' %}"></script>
+<script src="{% static 'js/plugins/vue-easytable/easytable1.js' %}"></script>
+<!-- <script src="https://unpkg.com/vue-easytable/umd/js/index.js"></script> -->
+<!-- <script src="https://unpkg.com/element-ui@2.13.1/lib/index.js"></script> -->
+<script src="{% static 'js/element-ui@2.13.1/lib/index.js' %}"></script>
+
+<div style="display: none;">
+    <div id="table-source-api">{{ api }}</div>
+    <div id="can-export">{{ can_export }}</div>
+</div>
+<style>
+    .padding-5{
+        padding: 0px 0px;
+    }
+    .mbt-10{
+        margin-bottom: 10px;
+    }
+    .mbt-0{
+        margin-bottom: 0px;
+    }
+    .mr-5{
+        margin-right: 5px;
+    }
+    .mt-10{
+        margin-top: 10px;
+    }
+    .footer-cell-class-name-title{
+        background-color: #f60;
+        color: #fff;
+    }
+    .footer-cell-class-name-normal{
+        color: red;
+    }
+    .el-row {
+        margin-bottom: 20px;
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+    .el-col {
+        border-radius: 4px;
+    }
+    .bg-purple-dark {
+        background: #99a9bf;
+    }
+    .bg-purple {
+        background: #d3dce6;
+    }
+    .bg-purple-light {
+        background: #e5e9f2;
+    }
+    .grid-content {
+        border-radius: 4px;
+        min-height: 36px;
+    }
+    .row-bg {
+        padding: 10px 0;
+        background-color: #f9fafc;
+    }
+    .gray-smaller-label {
+        /* font-size: smaller;  */
+        color: gray;
+        margin-bottom: 5px;
+    }
+    .el-drawer__body {
+        overflow: hidden;
+    }
+    .ibox{
+        margin-bottom: 0px;
+    }
+    .ibox-content{
+        padding-bottom: 10px;
+    }
+    [v-cloak]{
+        display: none;
+    }
+    tbody tr{
+        height: 30px;
+    }
+</style>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox " id="saler-kpi-month" v-cloak>
+            <div class="ibox-title" style="padding-top: 8px;"> 
+                1、某项指标为0的商务人数
+            </div>
+            <div class="ibox-content">
+                <el-table
+                    :data="tableData"
+                    stripe
+                    border
+                    style="">
+                    <el-table-column
+                        prop="join_days"
+                        label="司龄"
+                        width="100">
+                    </el-table-column>
+                    <el-table-column
+                        prop="month_new_performance"
+                        label="新签业绩为0"
+                        width="100">
+                        <template slot-scope="scope">
+                            <a v-if="scope.row.month_new_performance > 0" :href="makeLink0(scope.row, 'month_new_performance')" target="_blank" class="buttonText">[[ scope.row.month_new_performance ]]</a>
+                            <span v-else>[[ scope.row.month_new_performance ]]</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="month_renew_performance"
+                        label="续签业绩为0"
+                        width="100">
+                        <template slot-scope="scope">
+                            <a v-if="scope.row.month_renew_performance > 0" :href="makeLink0(scope.row, 'month_renew_performance')" target="_blank" class="buttonText">[[ scope.row.month_renew_performance ]]</a>
+                            <span v-else>[[ scope.row.month_renew_performance ]]</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="month_performance"
+                        label="总业绩为0"
+                        width="100">
+                        <template slot-scope="scope">
+                            <a v-if="scope.row.month_performance > 0" :href="makeLink0(scope.row, 'month_performance')" target="_blank" class="buttonText">[[ scope.row.month_performance ]]</a>
+                            <span v-else>[[ scope.row.month_performance ]]</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="month_head_confirm_money"
+                        label="月初承诺为0"
+                        width="100">
+                        <template slot-scope="scope">
+                            <a v-if="scope.row.month_head_confirm_money > 0" :href="makeLink0(scope.row, 'month_head_confirm_money')" target="_blank" class="buttonText">[[ scope.row.month_head_confirm_money ]]</a>
+                            <span v-else>[[ scope.row.month_head_confirm_money ]]</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="confirm_goal_rate"
+                        label="月初承诺/当月任务低于60%"
+                        width="150">
+                        <template slot-scope="scope">
+                            <a v-if="scope.row.confirm_goal_rate > 0" :href="makeLink(scope.row, 'confirm_goal_rate', 0, 60)" target="_blank" class="buttonText">[[ scope.row.confirm_goal_rate ]]</a>
+                            <span v-else>[[ scope.row.confirm_goal_rate ]]</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="month_complete_money"
+                        label="当月归档为0"
+                        width="100">
+                        <template slot-scope="scope">
+                            <a v-if="scope.row.month_complete_money > 0" :href="makeLink0(scope.row, 'month_complete_money')" target="_blank" class="buttonText">[[ scope.row.month_complete_money ]]</a>
+                            <span v-else>[[ scope.row.month_complete_money ]]</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="month_call_num"
+                        label="当月电话次数为0"
+                        width="150">
+                        <template slot-scope="scope">
+                            <a v-if="scope.row.month_call_num" :href="makeLink0(scope.row, 'month_call_num')" target="_blank" class="buttonText">[[ scope.row.month_call_num ]]</a>
+                            <span v-else>[[ scope.row.month_call_num ]]</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="month_visit_num"
+                        label="当月出差次数为0"
+                        width="130">
+                        <template slot-scope="scope">
+                            <a v-if="scope.row.month_visit_num > 0" :href="makeLink0(scope.row, 'month_visit_num')" target="_blank" class="buttonText">[[ scope.row.month_visit_num ]]</a>
+                            <span v-else>[[ scope.row.month_visit_num ]]</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="ms_month_active_num"
+                        label="当月秘书账号活跃数为0"
+                        width="100">
+                        <template slot-scope="scope">
+                            <a v-if="scope.row.ms_month_active_num > 0" :href="makeLink0(scope.row, 'ms_month_active_num')" target="_blank" class="buttonText">[[ scope.row.ms_month_active_num ]]</a>
+                            <span v-else>[[ scope.row.ms_month_active_num ]]</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="ms_month_new_num"
+                        label="当月秘书账号新建数为0"
+                        width="100">
+                        <template slot-scope="scope">
+                            <a v-if="scope.row.ms_month_new_num > 0" :href="makeLink0(scope.row, 'ms_month_new_num')" target="_blank" class="buttonText">[[ scope.row.ms_month_new_num ]]</a>
+                            <span v-else>[[ scope.row.ms_month_new_num ]]</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="ts_month_active_num"
+                        label="当月态势账号活跃数为0"
+                        width="100">
+                        <template slot-scope="scope">
+                            <a v-if="scope.row.ts_month_active_num > 0" :href="makeLink0(scope.row, 'ts_month_active_num')" target="_blank" class="buttonText">[[ scope.row.ts_month_active_num ]]</a>
+                            <span v-else>[[ scope.row.ts_month_active_num ]]</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="ts_month_new_num"
+                        label="当月态势账号新建数为0"
+                        width="100">
+                        <template slot-scope="scope">
+                            <a v-if="scope.row.ts_month_new_num > 0" :href="makeLink0(scope.row, 'ts_month_new_num')" target="_blank" class="buttonText">[[ scope.row.ts_month_new_num ]]</a>
+                            <span v-else>[[ scope.row.ts_month_new_num ]]</span>
+                        </template>
+                    </el-table-column> 
+                </el-table>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="init-data" style="display: none;">{{ init_data }}</div>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+{% block js_tail %}
+    <!-- Peity -->
+    <script src="{% static 'js/plugins/peity/jquery.peity.min.js' %}"></script>
+    <script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+
+    <!-- JSKnob -->
+    <script src="{% static 'js/plugins/jsKnob/jquery.knob.js' %}"></script>
+    <script src="{% static 'js/plugins/datapicker/bootstrap-datepicker.js' %}"></script>
+    <script src="{% static 'js/plugins/ionRangeSlider/ion.rangeSlider.min.js' %}"></script>
+    <!-- <script src="{% static 'js/plugins/echarts/china.js' %}"></script> -->
+    <!-- <script src="{% static 'js/sale/g-center-data.js' %}"></script> -->
+    <script src="{% static 'js/sale/saler-kpi-overview.js' %}"></script>
+{% endblock %}

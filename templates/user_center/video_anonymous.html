@@ -1,0 +1,42 @@
+{% load i18n static %}
+
+<html>
+    <head>
+        <title>{{ title }}</title>
+    </head>
+    <body>
+        <div class="row">
+            <div style="width: 100%; height: 100%;">
+                <div class="ibox">
+                    <div class="ibox-title" style="padding-top: 8px;">    
+                        {{ video.title}}
+                    </div>
+                    <div class="ibox-content">
+                        <video  controls>
+                            <source src="{{ video.url }}" type="video/mp4">
+                            <source src="{{ video.url }}" type="video/ogg">
+                            <source src="{{ video.url }}" type="video/webm">
+                            <source src="{{ video.url }}" type="video/wmv">
+                            <object data="{{ video.url }}" >
+                            <embed src="{{ video.url }}" >
+                            </object>
+                        </video>
+                        <div style="padding-top: 8px;">
+                            {{ video.comment }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix" style="display: none;"></div>
+        </div>        
+    </body>
+</html>
+
+{% block js_tail %}
+    <!-- Peity -->
+    <script src="{% static 'js/plugins/peity/jquery.peity.min.js' %}"></script>
+    <script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+
+    <!-- JSKnob -->
+    <script src="{% static 'js/plugins/jsKnob/jquery.knob.js' %}"></script>
+{% endblock %}

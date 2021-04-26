@@ -1,0 +1,346 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block css_tail %}
+<!-- <link rel="stylesheet" href="https://unpkg.com/vue-easytable/umd/css/index.css">
+<link rel="stylesheet" href="https://unpkg.com/element-ui@2.13.1/lib/theme-chalk/index.css"> -->
+
+<link rel="stylesheet" href="{% static 'css/plugins/vue-easytable/umd/css/index.css' %}">
+<link rel="stylesheet" href="{% static 'css/element-ui@2.13.1/lib/theme-chalk/index.css' %}">
+
+<link rel="stylesheet" href="{% static 'css/plugins/vue-easytable/umd/css/v-checkbox-group.css' %}">
+<link rel="stylesheet" href="{% static 'css/plugins/vue-easytable/umd/css/v-search.css' %}">
+<link rel="stylesheet" href="{% static 'css/product/accounts_list.css' %}">
+
+<link rel="stylesheet" href="{% static 'css/plugins/datapicker/datepicker3.css' %}">
+{% endblock %}
+
+{% block body %}
+<script src="{% static 'js/plugins/echarts/echarts-all.js' %}"></script>
+<script src="{% static 'js/plugins/echarts/echarts.min.js' %}"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
+
+<script src="{% static 'js/npm/vue@2.6.11' %}"></script>
+<script src="{% static 'js/axios/dist/axios.min.js' %}"></script>
+<script src="{% static 'js/plugins/vue-easytable/easytable.js' %}"></script>
+<script src="{% static 'js/plugins/vue-easytable/easytable1.js' %}"></script>
+<!-- <script src="https://unpkg.com/vue-easytable/umd/js/index.js"></script> -->
+<!-- <script src="https://unpkg.com/element-ui@2.13.1/lib/index.js"></script> -->
+<script src="{% static 'js/element-ui@2.13.1/lib/index.js' %}"></script>
+
+<div style="display: none;">
+    <div id="department-api">{{ departments_api }}</div>
+</div>
+<style>
+    .padding-5{
+        padding: 0px 0px;
+    }
+    .mbt-10{
+        margin-bottom: 10px;
+    }
+    .mbt-0{
+        margin-bottom: 0px;
+    }
+    .mr-5{
+        margin-right: 5px;
+    }
+    .mt-10{
+        margin-top: 10px;
+    }
+    .footer-cell-class-name-title{
+        background-color: #f60;
+        color: #fff;
+    }
+    .footer-cell-class-name-normal{
+        color: red;
+    }
+    .el-row {
+        margin-bottom: 20px;
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+    .el-col {
+        border-radius: 4px;
+    }
+    .bg-purple-dark {
+        background: #99a9bf;
+    }
+    .bg-purple {
+        background: #d3dce6;
+    }
+    .bg-purple-light {
+        background: #e5e9f2;
+    }
+    .grid-content {
+        border-radius: 4px;
+        min-height: 36px;
+    }
+    .row-bg {
+        padding: 10px 0;
+        background-color: #f9fafc;
+    }
+    .gray-smaller-label {
+        /* font-size: smaller;  */
+        color: gray;
+        margin-bottom: 5px;
+    }
+    .el-drawer__body {
+        overflow: hidden;
+    }
+</style>
+<div class="row">
+    <div class="col-md-12 padding-5" style="width: 100%; height: 100%;">
+        <div class="tabs-container">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a data-toggle="tab" href="#tab-yqms4_log" aria-expanded="false" onclick="toggleFunc(this);">秘书4.0日志</a>
+                </li>
+                <li>
+                    <a data-toggle="tab" href="#tab-yqms3_log" aria-expanded="false" onclick="toggleFunc(this);">秘书3.0日志</a>
+                </li>
+            </ul>
+            <div class="tab-content" style="height: 100%;">
+                <div id="tab-yqms4_log" class="tab-pane active" style="height: 100%;">
+                    <div class="panel-body" style="width: 100%; height: 100%;">
+                        <div id="yqms4_log">
+
+                            <div style="margin-top: 10px;"></div>
+                            <div class="ibox float-e-margins" style="margin-bottom: 5px;">
+                                <div class="ibox-content">
+                                    <form method="GET" onsubmit="return false;" class="form-horizontal" id="log4-filter-form">
+                                        <!-- {% csrf_token %} -->
+                                        <div class="form-group">
+                                            <div class="col-sm-12">
+                                                <div class="col-lg-3 col-md-4 col-sm-6" id="data_4" style="margin-top: 5px; padding-left: 1px; padding-right: 1px;">
+                                                    <label><nobr>操作日期：</nobr></label>
+                                                    <div class="input-daterange input-group" id="datepicker4">
+                                                        <input type="text" class="input-sm form-control" id="log_date4" name="log_date4" style="width: 110%;"
+                                                               v-model="logDate4"/>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-2 col-md-4 col-sm-6" style="float: right; margin-top: 5px;">
+                                                    <label></label>
+                                                    <div>
+                                                        <button class="btn btn-primary col-md-5 col-sm-4"  id="submitBtn4" @click="getSourceTableData">查询</button>
+                                                        <button class="btn btn-white col-md-5 col-sm-4" style="float: right; margin-left: 3px;"type="reset"  id="resetBtn4">重置</button>
+                                                    </div>
+                                                </div>
+                                                <div style="clear: both;"></div>
+                                            </div>
+
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            {#------------------------------conditions--------------------------------#}
+                            <a style="height: 26px; line-height: 26px;">筛选项:</a>
+                            <template v-for="(v, k) in conditions">
+                                <span style="border: solid 1px; border-radius: 4px; border-color: rgba(255,255,255,.5); background-color: white;">
+                                    <span type="" class="el-button--mini">
+                                        [[ v ]]
+                                    </span>
+                                    <i @click="removeCondition(k)" class="el-icon-close" style="cursor: pointer;"></i>
+                                </span>
+                            </template>
+
+                            <div>
+                                <template>
+                                    <div style="margin-bottom: 5px;">
+                                        <v-table
+                                                ref="table1"
+                                                :is-loading = "loading"
+                                                is-vertical-resize
+                                                :vertical-resize-offset='40'
+                                                is-horizontal-resize
+                                                style="width:100%"
+                                                :multiple-sort="false"
+                                                :min-height="350"
+                                                even-bg-color="#f2f2f2"
+                                                :title-rows="tableConfig.titleRows"
+                                                :columns="tableConfig.columns"
+                                                :table-data="tableConfig.tableData"
+                                                row-hover-color="#eee"
+                                                row-click-color="#edf7ff"
+                                                @sort-change="sortChange"
+                                                :paging-index="(pageIndex-1)*pageSize"
+                                                :filter-method="filterMethod"
+                                                @search-method="searchMethod"
+                                                row-height="35"
+                                        ></v-table>
+                                    </div>
+                                    <div v-show="needRetry">
+                                        <div class="col-md-4"></div>
+                                        <div class="col-md-4"><el-button @click="retry" style="margin-left: 46%;">重试</el-button></div>
+                                        <div class="col-md-4"></div>
+                                        <div class="clearfix" style="display: none;"></div>
+                                    </div>
+                                    <div class="mt20 mb20 bold mt-10" v-show="!needRetry">
+                                        <!--分页条-->
+                                        <div class="col-md-4"></div>
+                                        <div class="col-md-6">
+                                            <v-pagination
+                                                size="small"
+                                                @page-change="pageChange"
+                                                @page-size-change="pageSizeChange"
+                                                :total="total"
+                                                :page-index="pageIndex"
+                                                :page-size="pageSize"
+                                                :layout="['total', 'prev', 'pager', 'next', 'sizer', 'jumper']"
+                                            ></v-pagination>
+                                        </div>
+                                        <div class="col-md-2"></div>
+                                        <div class="clearfix" style="display: none;"></div>
+                                    </div>
+                                </template>
+
+                                <style>
+                                    .title-cell-class-name-test1 {
+                                        background-color: #2db7f5;
+                                        color:#fff;
+                                    }
+                                    .title-cell-class-name-test2 {
+                                        background-color: #f60;
+                                        color:#fff;
+                                    }
+                                </style>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="tab-yqms3_log" class="tab-pane" style="height: 100%;">
+                    <div class="panel-body" style="width: 100%; height: 100%;">
+                        <div id="yqms3_log">
+
+                            <div style="margin-top: 10px;"></div>
+                            <div class="ibox float-e-margins" style="margin-bottom: 5px;">
+                                <div class="ibox-content">
+                                    <form method="GET" onsubmit="return false;" class="form-horizontal" id="log3-filter-form">
+                                        <!-- {% csrf_token %} -->
+                                        <div class="form-group">
+                                            <div class="col-sm-12">
+                                                <div class="col-lg-3 col-md-4 col-sm-6" id="data_3" style="margin-top: 5px; padding-left: 1px; padding-right: 1px;">
+                                                    <label><nobr>操作日期：</nobr></label>
+                                                    <div class="input-daterange input-group" id="datepicker3">
+                                                        <input type="text" class="input-sm form-control" id="log_date3" name="log_date3" style="width: 110%;"
+                                                                v-model="logDate3" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-2 col-md-4 col-sm-6" style="float: right; margin-top: 5px;">
+                                                    <label></label>
+                                                    <div>
+                                                        <button class="btn btn-primary col-md-5 col-sm-4"  id="submitBtn3" @click="getSourceTableData">查询</button>
+                                                        <button class="btn btn-white col-md-5 col-sm-4" style="float: right; margin-left: 3px;"type="reset"  id="resetBtn3">重置</button>
+                                                    </div>
+                                                </div>
+                                                <div style="clear: both;"></div>
+                                            </div>
+
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            {#------------------------------conditions--------------------------------#}
+                            <a style="height: 26px; line-height: 26px;">筛选项:</a>
+                            <template v-for="(v, k) in conditions">
+                                <span style="border: solid 1px; border-radius: 4px; border-color: rgba(255,255,255,.5); background-color: white;">
+                                    <span type="" class="el-button--mini">
+                                        [[ v ]]
+                                    </span>
+                                    <i @click="removeCondition(k)" class="el-icon-close" style="cursor: pointer;"></i>
+                                </span>
+                            </template>
+
+                            <div>
+                                <template>
+                                    <div style="margin-bottom: 5px;">
+                                        <v-table
+                                                ref="table1"
+                                                :is-loading = "loading"
+                                                is-vertical-resize
+                                                :vertical-resize-offset='40'
+                                                is-horizontal-resize
+                                                style="width:100%"
+                                                :multiple-sort="false"
+                                                :min-height="350"
+                                                even-bg-color="#f2f2f2"
+                                                :title-rows="tableConfig.titleRows"
+                                                :columns="tableConfig.columns"
+                                                :table-data="tableConfig.tableData"
+                                                row-hover-color="#eee"
+                                                row-click-color="#edf7ff"
+                                                @sort-change="sortChange"
+                                                :paging-index="(pageIndex-1)*pageSize"
+                                                :filter-method="filterMethod"
+                                                @search-method="searchMethod"
+                                                row-height="35"
+                                        ></v-table>
+                                    </div>
+                                    <div v-show="needRetry">
+                                        <div class="col-md-4"></div>
+                                        <div class="col-md-4"><el-button @click="retry" style="margin-left: 46%;">重试</el-button></div>
+                                        <div class="col-md-4"></div>
+                                        <div class="clearfix" style="display: none;"></div>
+                                    </div>
+                                    <div class="mt20 mb20 bold mt-10" v-show="!needRetry">
+                                        <!--分页条-->
+                                        <div class="col-md-4"></div>
+                                        <div class="col-md-6">
+                                            <v-pagination
+                                                size="small"
+                                                @page-change="pageChange"
+                                                @page-size-change="pageSizeChange"
+                                                :total="total"
+                                                :page-index="pageIndex"
+                                                :page-size="pageSize"
+                                                :layout="['total', 'prev', 'pager', 'next', 'sizer', 'jumper']"
+                                            ></v-pagination>
+                                        </div>
+                                        <div class="col-md-2"></div>
+                                        <div class="clearfix" style="display: none;"></div>
+                                    </div>
+                                </template>
+
+                                <style>
+                                    .title-cell-class-name-test1 {
+                                        background-color: #2db7f5;
+                                        color:#fff;
+                                    }
+                                    .title-cell-class-name-test2 {
+                                        background-color: #f60;
+                                        color:#fff;
+                                    }
+                                </style>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="clearfix" style="display: none;"></div>
+</div>
+<!--<div id="init-data" style="display: none;">{{ init_data }}</div>-->
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+{% block js_tail %}
+    <!-- Peity -->
+    <script src="{% static 'js/plugins/peity/jquery.peity.min.js' %}"></script>
+    <script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+
+    <!-- JSKnob -->
+    <script src="{% static 'js/plugins/jsKnob/jquery.knob.js' %}"></script>
+    <!-- Date picker -->
+    <script src="{% static 'js/plugins/datapicker/bootstrap-datepicker.js' %}"></script>
+    <script src="{% static 'js/plugins/ionRangeSlider/ion.rangeSlider.min.js' %}"></script>
+
+    <script src="{% static 'js/product/yqms_log_detail.js' %}?version=0.0.02"></script>
+    <script src="{% static 'js/product/portrait.js' %}?version=0.0.1"></script>
+    <script src="{% static 'js/product/g-center.js' %}?version=0.0.1"></script>
+{% endblock %}

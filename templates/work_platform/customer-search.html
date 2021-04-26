@@ -1,0 +1,36 @@
+{% extends 'work_platform/customer-list.html' %}
+{% load i18n static %}
+
+{% block head_options %}
+    <div class="title">
+        <div id="sidebar-btn" style="margin-top: .14rem;">
+            <img  @click="toSidebar" src="/static/img/hamburg64.png" />
+        </div>
+        <div id="top-opts" style="margin-left: .50rem; margin-top: .06rem; width: 5rem; font-size: .24rem;">
+            <van-field 
+                v-model="searcher" 
+                round 
+                name="searcher" 
+                placeholder="请输入客户名称"
+                :style="{ 'border': '1px solid', 'border-radius': '.20rem', 'font-size': '.24rem', height: '.70rem' }">
+            </van-field>
+        </div>
+        <div id="tools">
+            <span id="search" class="head-icon">
+                <img @click="onSearch()" src="/static/img/search64-white.png" />
+            </span>
+        </div>
+        <div style="display: none; clear: both;"></div>
+    </div>
+    <div style="clear: both;"></div>
+    <div id="conditions"></div>
+{% endblock %}
+
+{% block js_tail %}
+
+<script src="{% static 'js/work_platform/base/list-mixin.js' %}?version=1.1.2"></script>
+<script src="{% static 'js/work_platform/base/sidebar-mixin.js' %}?version=1.1.2"></script>
+<script src="{% static 'js/work_platform/customer/customerListMixin.js' %}?version=1.1.2"></script>
+<script src="{% static 'js/work_platform/customer/search.js' %}?version=1.1.2"></script>
+
+{% endblock %}

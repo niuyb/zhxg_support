@@ -1,0 +1,754 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block css_tail %}
+<link href="{% static 'css/plugins/jqgrid/ui.jqgrid.css' %}" rel="stylesheet">
+<link href="{% static 'css/plugins/datapicker/datepicker3.css' %}" rel="stylesheet">
+<link rel="stylesheet" href="//at.alicdn.com/t/font_2437752_syhgdm6iepr.css">
+<link rel="stylesheet" href="{% static 'css/element-ui@2.13.1/lib/theme-chalk/index.css' %}">
+<style>
+    el-dialog__wrapper {
+        z-index: 3000;
+    }
+
+    [v-cloak] {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<script src="{% static 'js/npm/vue@2.6.11' %}"></script>
+<script src="{% static 'js/axios/dist/axios.min.js' %}"></script>
+<script src="{% static 'js/plugins/qs/qs.min.js' %}"></script>
+<!-- <script src="{% static 'js/plugins/vue-easytable/easytable.js' %}"></script> -->
+<!-- <script src="https://unpkg.com/vue-easytable/umd/js/index.js"></script> -->
+<!-- <script src="https://unpkg.com/element-ui@2.13.1/lib/index.js"></script> -->
+<script src="{% static 'js/element-ui@2.13.1/lib/index.js' %}"></script>
+
+<div style="display: none;">
+    <div id="department-data">{{ industry_data }}</div>
+    <div id="department-data-1">{{ industry_data_1 }}</div>
+    <div id="customer-list-api">{% url 'customer:customer_list_api' %}</div>
+    <div id="fields-to-check">{{ fields_to_check }}</div>
+    <div id="states">{{ states }}</div>
+    <div id="cities">{{ cities }}</div>
+    <div id="districts">{{ districts }}</div>
+</div>
+
+<div class="row">
+    <div v-cloak id="app" style="z-index: 3000;">
+        <el-dialog title="选择资料" center :visible.sync="materialListVisible" v-loading="materialListLoading">
+            <el-table ref="multipleTable" :data="tableData" row-key="id" tooltip-effect="dark"
+                style="width: 100%; margin-bottom: 20px;" border fit>
+                <el-table-column prop="title" label="标题" width="200">
+                </el-table-column>
+                <el-table-column prop="comment" label="描述" width="300">
+                </el-table-column>
+                <el-table-column label="播放地址" prop="url" width="200">
+                    <template slot-scope="scope">
+                        <el-link type="primary" :href="scope.row.url" target="_blank">
+                            [[ window.location.origin + scope.row.url ]]
+                        </el-link>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="operation" label="操作" width="200">
+                    <template slot="header" slot-scope="scope">
+                        <el-input v-model="search" size="mini" placeholder="输入关键字搜索" />
+                    </template>
+                    <template slot-scope="scope">
+                        <el-button-group>
+                            <el-button size="mini" type="primary" @click="handleChoose(scope.$index, scope.row)">选中
+                            </el-button>
+                        </el-button-group>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                :current-page="currentPage" :page-sizes="pageSizes" :page-size="pageSize"
+                layout="total, sizes, prev, pager, next, jumper" :total="totalNum">
+            </el-pagination>
+
+            <div v-cloak slot="footer" class="dialog-footer">
+                <el-button @click="materialListVisible = false">关闭</el-button>
+            </div>
+        </el-dialog>
+    </div>
+    <div class="col-sm-12">
+        <div style="margin-top: 10px;"></div>
+        <div class="ibox float-e-margins" style="margin-bottom: 10px;">
+            <!-- <div style="margin-top: 5px;"></div> -->
+            <!-- <div class="ibox-title">
+                <h5>客户查询</h5>
+                <div class="ibox-tools"></div>
+            </div> -->
+            <div class="ibox-content">
+                <div id="form-dict" style="display: none;">{{ form_dict }}</div>
+                <form method="GET" onsubmit="return false;" class="form-horizontal" id="customer-list-filter-form">
+                    <!-- {% csrf_token %} -->
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <div class="col-lg-2 col-md-3 col-sm-6" style="margin-top: 5px;">
+                                <label>
+                                    <nobr>客户名称：</nobr>
+                                </label>
+                                <input type="text" class="form-control" placeholder="模糊查询" name="customer_name" id="account_name">
+                            </div>
+                            <div class="col-lg-1 col-md-2 col-sm-3" style="margin-top: 5px;">
+                                <label>
+                                    <nobr>是否覆盖<img src="/static/img/wenhao2.png"
+                                            style="max-width:15px; margin-left: 2px;" title="覆盖=正式 + 试用">：</nobr>
+                                </label>
+                                <!-- <select type="text" class="form-control" name="account_status"></select> -->
+                                {{ form.coverage }}
+                            </div>
+                            <div class="col-lg-1 col-md-2 col-sm-3" style="margin-top: 5px;">
+                                <label>
+                                    <nobr>客户状态：</nobr>
+                                </label>
+                                <!-- <select type="text" class="form-control" name="account_status"></select> -->
+                                {{ form.status }}
+                            </div>
+                            <div class="col-lg-1 col-md-2 col-sm-3" style="margin-top: 5px;">
+                                <label>
+                                    <nobr>微信群状态：</nobr>
+                                </label>
+                                <!-- <select type="text" class="form-control" name="account_status"></select> -->
+                                {{ form.wechat_group }}
+                            </div>
+                            <div class="col-md-1 col-md-2 col-sm-3" style="margin-top: 5px; display: none;">
+                                <input name="industry" id="department-value" />
+                            </div>
+
+                            <div class="col-lg-2 col-md-3 col-sm-3" id="id_department-1" style="margin-top: 5px;">
+                                <label>
+                                    <nobr>一级行业：</nobr>
+                                </label>
+                                <select {% if xtype == 1 or xtype == '1' %} disabled="disabled" {% endif %} type="text"
+                                    class="form-control" id="department-1" name="industry1"
+                                    onchange="onDepartmentChange1()" style="padding-top: 2px;"></select>
+                            </div>
+                            <div class="col-lg-2 col-md-3 col-sm-3" id="id_department-2"
+                                style="margin-top: 5px; display: none;">
+                                <label>
+                                    <nobr>二级行业：</nobr>
+                                </label>
+                                <select type="text" class="form-control" id="department-2" name="industry2"
+                                    style="padding-top: 2px;"></select>
+                            </div>
+
+                            <div class="col-lg-2 col-md-3 col-sm-3" style="margin-top: 5px;" id="location-div-1">
+                                <label>客户地域-省：</label>
+                                <!-- <label><nobr>客户地域：</nobr></label> -->
+                                <select type="text" class="form-control" name="state" style="padding-top: 2px;"
+                                    id="location-select-1"
+                                    onchange="onSelectChange('location', 1, commonLocation.getCities)"></select>
+                                <!-- {{ form.state }} -->
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-3" style="margin-top: 5px; display: none;"
+                                id="location-div-2">
+                                <label>
+                                    <nobr>客户地域-市：</nobr>
+                                </label>
+                                <select type="text" class="form-control" name="city" style="padding-top: 2px;"
+                                    id="location-select-2"
+                                    onchange="onSelectChange('location', 2, commonLocation.getDistricts)"></select>
+                                <!-- {{ form.city }} -->
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-3" style="margin-top: 5px; display: none;"
+                                id="location-div-3">
+                                <label>
+                                    <nobr>客户地域-县：</nobr>
+                                </label>
+                                <select type="text" class="form-control" name="district" style="padding-top: 2px;"
+                                    id="location-select-3"></select>
+                                <!-- {{ form.district }} -->
+                            </div>
+                            <div style="display: none;">
+                                <label for="">查询哪张数据表？</label>
+                                <input name="xtype" value="{{ xtype }}" />
+                            </div>
+
+                            <div class="col-lg-3 col-md-4 col-sm-6" style="float: right; margin-top: 5px;">
+                                <label></label>
+                                <div>
+                                    <button class="btn btn-primary col-md-3 col-sm-3 col-sm-offset-1" type="submit"
+                                    id="submitBtn" style="padding: 4px 0px;">搜索</button>
+                                    <button class="btn btn-primary col-md-3 col-sm-3 col-sm-offset-1" onclick="openSyn()" style="padding: 4px 0px;">同步</button>
+                                    <button class="btn btn-white col-md-3 col-sm-3 col-sm-4 col-sm-offset-1"
+                                        type="reset" style="float: right;padding: 4px 0px;" id="resetBtn" >重置</button>
+                                </div>
+                            </div>
+                            <div style="clear: both;"></div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="ibox ">
+            <!-- <div class="ibox-title">
+                <h5>jQuery Grid Plugin – jqGrid</h5>
+            </div> -->
+            <div class="ibox-content">
+
+                <div class="jqGrid_wrapper">
+                    <table id="table_list_1"></table>
+                    <div id="pager_list_1"></div>
+                </div>
+                <!-- <p>&nbsp;</p>
+                <h4 class="m-t">高级用法</h4>
+
+
+                <div class="jqGrid_wrapper">
+                    <table id="table_list_2"></table>
+                    <div id="pager_list_2"></div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+</div>
+<div id="init-data" style="display: none;">{{ init_data }}</div>
+
+<!-- 创建成功弹窗 -->
+<div enctype="multipart/form-data" class="form-horizontal" role="form" id="createdSucForm">
+    <div class="modal fade" id="createdSucModal" tabindex="-1" role="dialog" aria-labelledby="createdSucModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width:600px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="createdSucModalLabel" style="display: inline; text-align:center">自动创建账号成功</h4>
+                    <h4 class="modal-title" id="createdSucLabel" style="display: inline;">自动创建账号成功,自动创建专题失败！</h4>
+                </div>
+                <div class="modal-body">
+                    <div style="display:block;margin:20px 0;font-size:16px" id="noSyc">
+                        了解最真实的客户业务，提供最精准的监测服务，推荐客户填写监测范围确认表，
+                        <a href="#" onclick="enterSyn()">发送调研表</a>
+                        <input type="text" id="enterId" name="enterId" hidden />
+                        <input type="text" id="enterSecretaryUrl" name="enterSecretaryUri" hidden />
+                    </div>
+                    <div style="display:block;margin:20px 0;font-size:16px;text-align: center;" id="hasSyc">
+                        请进入秘书账号查看！
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="enterSecretary()">进入舆情秘书</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+</div>
+
+<!-- 同步弹窗 -->
+<div enctype="multipart/form-data" class="form-horizontal" role="form" id="synForm">
+    <div class="modal fade" id="synModal" tabindex="-1" role="dialog" aria-labelledby="synModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width:800px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="synModalLabel">手动同步客户</h4>
+                </div>
+                <div class="modal-body">
+                    <div style="display: flex; align-items: center;margin:20px 0;">
+                        <input type="text" class="form-control" placeholder="请输入客户关键字" id="synSearch" name="synSearch" />
+                        <input type="hidden" id="other">
+                        <button type="button" class="btn btn-primary" style="margin-left:20px" onclick="synSearchF()">搜索</button>
+                    </div>
+                    <div id="synList"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">暂不同步</button>
+                    <button type="button" class="btn btn-primary" onclick="synStart()">开始同步</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+</div>
+
+<!-- 二维码弹窗 -->
+<div enctype="multipart/form-data" class="form-horizontal" role="form" id="qrcodeForm">
+    <div class="modal fade" id="qrcodeModal" tabindex="-1" role="dialog" aria-labelledby="synModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width:800px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="qrcodeModalLabel">发送调研表</h4>
+                </div>
+                <div class="modal-body">
+                    <div style="display:flex; justify-content: center;align-items:center; flex-direction: column;">
+                        <div>为了解最真实的客户业务，提供最精准的监测服务，推荐客户填写监测范围确认表</div>
+                        <div id="qrcode" style="width:200px; height:200px; margin:15px 0px;"></div>
+                    </div>
+                    <div style="display: flex; align-items: center;margin:20px 0;">
+                        <input type="text" class="form-control" id="qrcodeInput" name="qrcodeInput" readonly="readonly"/>
+                        <button type="button" class="btn btn-primary" style="margin-left:20px" onclick="copyUrl()">复制</button>
+                    </div>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+</div>
+
+<!-- 模态框示例（Modal） -->
+<form method="post" action="" enctype="multipart/form-data" class="form-horizontal" role="form" id="messageForm"
+    onsubmit="return pushWechatMessage(this)" style="margin: 20px;">
+    <!-- {% csrf_token %} -->
+    <div class="modal fade" id="messageModal" aria-labelledby="messageModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="text-align: center;">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="messageModalLabel">微信群推送</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" role="form" enctype="multipart/form-data">
+                        <!-- {% csrf_token %} -->
+                        <input type="text" id="customerIds" name="customerIds" hidden />
+                        <input type="text" id="pushType" name="pushType" hidden />
+
+                        <div class="form-group">
+                            <label for="customerNames" class="col-sm-3 control-label">
+                                客户名称:</label>
+
+                            <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px;">
+                                <!-- <input type="text" class="form-control" id="customerNames" name="customerNames" disabled="disabled" /> -->
+                                <textarea class="form-control" id="customerNames" name="customerNames"
+                                    form="messageForm" disabled="disabled"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="messageTitle" class="col-sm-3 control-label">
+                                消息标题:</label>
+
+                            <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px;">
+                                <textarea class="form-control" id="messageTitle" name="messageTitle"
+                                    form="messageForm"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="messageContent" class="col-sm-3 control-label">
+                                <span style="color: red;">*</span>消息内容:</label>
+
+                            <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px;">
+                                <textarea class="form-control" id="messageContent" name="messageContent"
+                                    form="messageForm"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="messageUrl" class="col-sm-3 control-label">
+                                消息链接:</label>
+
+                            <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px;">
+                                <textarea class="form-control" id="messageUrl" name="messageUrl"
+                                    form="messageForm"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">选择资料：</label>
+                            <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px;">
+                                <button type="button" onclick="showMaterialList()">选择</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label"></label>
+                            <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px;">
+                                <span id="tip" style="color: red;"> </span>
+                            </div>
+                        </div>
+                </div>
+                <div class="modal-footer" style="text-align: center;">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" id="messageCloseBtn">关闭</button>
+                    <button type="button" class="btn btn-info" onclick="clearMessageForm()"
+                        id="messageClearBtn">清除</button>
+                    <button type="submit" class="btn btn-primary" id="messageSubmitBtn">提交</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+</form>
+
+<!-- 模态框示例（Modal） -->
+<form method="post" action="" enctype="multipart/form-data" class="form-horizontal" role="form" id="uploadForm"
+    onsubmit="return uploadQrCode(this)" style="margin: 20px;">
+    <!-- {% csrf_token %} -->
+    <div class="modal fade" id="uploadModal" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="text-align: center;">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">啊啊啊</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" role="form" enctype="multipart/form-data">
+                        <!-- {% csrf_token %} -->
+                        <input type="text" id="customerId" name="customer_id" hidden />
+
+                        <div class="form-group">
+                            <label for="customer_name" class="col-sm-3 control-label">
+                                客户名称:</label>
+
+                            <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px;">
+                                <input type="text" class="form-control" id="customerName" name="customer_name"
+                                    disabled="disabled" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="wechat_group_name" class="col-sm-3 control-label">
+                                微信群名称:</label>
+
+                            <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px;">
+                                <input type="text" class="form-control" id="wechatGroupName" name="wechat_group_name"
+                                    readonly="readonly" />
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="addQrCode">
+                            <span style="color:red">*</span>
+                            <label for="customer_name" class="col-sm-3 control-label">
+                                微信群二维码:</label>
+
+                            <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px;">
+                                <div id="showQrCode" onclick="fileSelect('qrCode')">
+                                    <img class="img-bg" src="" />
+                                </div>
+                                <input type="file" id="qrCode" name="qr_code"
+                                    onchange="showImage(this, 'showQrCode');" />
+                                <script type="text/javascript">
+                                    //-------------------文件图片上传
+                                    function fileSelect(elementId) {
+                                        document.getElementById(elementId).click();
+                                    }
+
+                                    function showImage(file, id) {
+                                        var div = document.getElementById(id);
+
+
+                                        if (file.files && file.files[0]) {
+                                            div.innerHTML = '<img id=img_' + id + '>';
+                                            var img = document.getElementById('img_' + id);
+                                            img.onload = function () {
+                                                img.width = "90";
+                                            }
+                                            var reader = new FileReader();
+                                            reader.onload = function (evt) {
+                                                img.src = evt.target.result;
+                                            }
+                                            reader.readAsDataURL(file.files[0]);
+                                        } else //兼容IE
+                                        {
+                                            var sFilter =
+                                                'filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale,src="';
+                                            file.select();
+                                            var src = document.selection.createRange().text;
+                                            div.innerHTML = '<img id=img_' + id + '>';
+                                            var img = document.getElementById('img_' + id);
+                                            img.filters.item('DXImageTransform.Microsoft.AlphaImageLoader').src = src;
+                                            var rect = clacImgZoomParam(MAXWIDTH, MAXHEIGHT, img.offsetWidth, img
+                                                .offsetHeight);
+                                            status = ('rect:' + rect.top + ',' + rect.left + ',' + rect.width + ',' +
+                                                rect.height);
+                                            div.innerHTML = "<div id=divhead style='width:" + rect.width +
+                                                "px;height:" + rect.height + "px;margin-top:" + rect.top + "px;" +
+                                                sFilter + src + "\"'></div>";
+                                        }
+
+                                        var tip = document.getElementById("tip");
+                                        tip.innerHTML = "";
+                                        $("#submitBtn").attr("disabled", null);
+                                    }
+                                </script>
+                            </div>
+
+                        </div>
+
+                        <span id="tip"> </span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" id="closeBtn">关闭</button>
+                    <button type="submit" class="btn btn-primary" id="uploadBtn">提交</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+</form>
+
+
+<meta http-equiv="Access-Control-Allow-Origin" content="http://support-beta.istarshine.com">
+<!-- 创建账号 -->
+<form method="post" action="" enctype="multipart/form-data" class="form-horizontal" role="form" id="uploadForm2"
+    onsubmit="return uploadQrCode(this)" style="margin: 20px;">
+    <!-- {% csrf_token %} -->
+    <div class="modal fade" id="uploadModal2" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content2">
+                <div class="modal-header" style="text-align: center;">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">创建舆情秘书账号</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" role="form" enctype="multipart/form-data">
+                        <!-- {% csrf_token %} -->
+                        <input type="text" id="customerId" name="customer_id" hidden />
+                        <div style="display: block">
+                            <div class="form-group">
+                                <label for="account_name" class="col-sm-3 control-label">
+                                    客户名称:</label>
+
+                                <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px;">
+                                    <input type="text" class="form-control2" id="accountName" name="account_name"
+                                        disabled="disabled" />
+                                    <input type="hidden" class="form-control2" id="accountId" name="account_id"
+                                        disabled="disabled" />
+                                    <input type="hidden" class="form-control2" id="newAccountId" name="newAccountId"
+                                        disabled="disabled" />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="login_name" class="col-sm-3 control-label">
+                                    登录名:</label>
+
+                                <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px;">
+                                    <input type="text" class="form-control2" id="loginName" name="login_name" />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="password" class="col-sm-3 control-label">
+                                    密码:</label>
+
+                                <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px; width:250px;">
+                                    <input type="text" class="form-control2" id="password" name="password" />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="industry" class="col-sm-3 control-label">
+                                    行业:</label>
+
+                                <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px;">
+                                    <div style="width:120px; float:left;">
+                                        <select type="text" class="form-control2" id="industry1" name="industry1"
+                                            disabled="disabled">
+                                            <option selected value="{{ industry1_id }}">{{ industry1 }}</option>
+                                        </select>
+                                    </div>
+                                    <div style="width:120px; float:left; margin-left:20px;">
+                                        <select type="text" class="form-control2" id="industry2" name="industry2"
+                                            disabled="disabled"></select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="phone" class="col-sm-3 control-label">
+                                    绑定手机:</label>
+
+                                <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px; width:250px;">
+                                    <input type="text" class="form-control2" id="phone" name="phone"
+                                        disabled="disabled" />
+                                    <input type="text" class="form-control2" id="check_phone_info"
+                                        name="check_phone_info" disabled="disabled" style="display: none" />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="area_belongs" class="col-sm-3 control-label">
+                                    所属地域:</label>
+
+                                <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px;">
+                                    <div style="width:120px; float:left;">
+                                        <select type="text" class="form-control2" id="state_area_belongs"
+                                            name="state_area_belongs" disabled="disabled"></select>
+                                    </div>
+                                    <div style="width:120px; float:left; margin-left:20px;">
+                                        <select type="text" class="form-control2" id="city_area_belongs"
+                                            name="city_area_belongs" disabled="disabled"></select>
+                                    </div>
+                                    <div style="width:120px; float:left; margin-left:20px;">
+                                        <select type="text" class="form-control2" id="district_area_belongs"
+                                            name="district_area_belongs" disabled="disabled"></select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="account_type" class="col-sm-3 control-label">
+                                    用户类型:</label>
+
+                                <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px; width:250px;">
+                                    <select type="text" class="form-control2" id="account_type" name="account_type"
+                                        disabled="disabled"></select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="version" class="col-sm-3 control-label">
+                                    版本选择:</label>
+
+                                <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px; width:250px;">
+                                    <select type="text" class="form-control2" id="version" name="version"
+                                        disabled="disabled"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: none" id="be_hidden">
+                            <div class="form-group">
+                                <label for="word_num" class="col-sm-3 control-label">
+                                    关键词数:</label>
+
+                                <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px; width:250px;">
+                                    <input type="text" class="form-control2" id="word_num" name="word_num"
+                                        disabled="disabled" />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="opp_name" class="col-sm-3 control-label">
+                                    商机名称:</label>
+
+                                <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px;">
+                                    <select type="text" class="form-control2" id="opp_name" name="opp_name"></select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="account_area" class="col-sm-3 control-label">
+                                    客户地域:</label>
+
+                                <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px;">
+                                    <div style="width:120px; float:left;">
+                                        <select type="text" class="form-control2" id="state_account_area"
+                                            name="state_account_area" disabled="disabled"></select>
+                                    </div>
+                                    <div style="width:120px; float:left; margin-left:20px;">
+                                        <select type="text" class="form-control2" id="city_account_area"
+                                            name="city_account_area" disabled="disabled"></select>
+                                    </div>
+                                    <div style="width:120px; float:left; margin-left:20px;">
+                                        <select type="text" class="form-control2" id="district_account_area"
+                                            name="district_account_area" disabled="disabled"></select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="display: none" id="region_lock_word_id">
+                                <label for="maintainer" class="col-sm-3 control-label">
+                                    锁定地域词:</label>
+
+                                <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px; width:250px;">
+                                    <input type="text" class="form-control2" id="region_lock_word"
+                                        name="region_lock_word" />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="opp_owner" class="col-sm-3 control-label">
+                                    商机负责人:</label>
+
+                                <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px; width:250px;">
+                                    <input type="text" class="form-control2" id="opp_owner" name="opp_owner"
+                                        disabled="disabled" />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="zh_type" class="col-sm-3 control-label">
+                                    账号类型:</label>
+
+                                <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px; width:250px;">
+                                    <select type="text" class="form-control2" id="zh_type" name="zh_type"></select>
+                                </div>
+                            </div>
+
+                            <div class="form-group" id="agent_div" style="display: none">
+                                <label for="agent" class="col-sm-3 control-label">
+                                    代理商:</label>
+
+                                <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px; width:50%;">
+                                    <input type="text" class="form-control2" id="agent_name" name="agent_name" />
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-default btn-position"
+                                        id="agentSearch">搜索</button>
+                                </div>
+                                <ul class="list-unstyled" the-id="agentResult"
+                                    style="display: none;width: 55%;border: 1px solid #ccc;background: #fff;cursor: pointer;right: 0; top: 33px;z-index:1;overflow-y: scroll;max-height: 180px;margin-left: 25%;font-size:15px;">
+                                </ul>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="maintainer" class="col-sm-3 control-label">
+                                    维护人:</label>
+
+                                <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px; width:250px;">
+                                    <input type="text" class="form-control2" id="maintainer" name="maintainer"
+                                        value="{{ request.user.username }}" />
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="display: none">
+                                <label for="maintainer" class="col-sm-3 control-label">
+                                    主题版本:</label>
+
+                                <div class="col-sm-7" style="padding-left: 0px;padding-right: 0px; width:250px;">
+                                    <select type="text" class="form-control2" id="templateType"
+                                        name="templateType"></select>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="modal-center" id="more_btn">
+                            <button type="button" class="btn btn-more iconfont icon-xiala" id="moreBtn">更多</button>
+                        </div>
+
+
+                        <span id="tip"> </span>
+                </div>
+                <div class="modal-footer">
+                    <span style="text-align: center;float: left;line-height: 2;color:red" id="addAccountTip">注：修改信息后请进行同步</span>
+                    <button type="button" class="btn btn-default" data-dismiss="modal" id="closeBtn">暂不创建</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal" id="crmEditBtn">修改客户信息</button>
+                    <!-- <button type="button" class="btn btn-default" data-dismiss="modal" id="crmSyncBtn">同步CRM</button> -->
+                    <button type="submit" class="btn btn-blue" id="addAccountBtn">生成账号</button>
+                    <button type="submit" class="btn btn-blue" id="addAccountBtnLoading" disabled="disabled" style="display: none;">
+                        <div style="display:flex;align-items: center;">
+                            <i class="iconfont icon-loading" style="animation: rotating 1s linear infinite;"></i>
+                            <div>生成中</div> 
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block js_tail %}
+<script src="{% static 'js/plugins/peity/jquery.peity.min.js' %}"></script>
+<script src="{% static 'js/plugins/jqgrid/i18n/grid.locale-cn.js' %}"></script>
+<script src="{% static 'js/plugins/jqgrid/jquery.jqGrid.min.js' %}"></script>
+<script src="{% static 'js/content.js' %}"></script>
+<script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+<script src="{% static 'js/plugins/jsKnob/jquery.knob.js' %}"></script>
+<script src="{% static 'js/plugins/datapicker/bootstrap-datepicker.js' %}"></script>
+<script src="{% static 'js/plugins/ionRangeSlider/ion.rangeSlider.min.js' %}"></script>
+<script src="{% static 'js/plugins/qrcode/qrcode.js' %}"></script>
+<script src="{% static 'js/customer/customer_list.js' %}"></script>
+<script src="{% static 'js/customer/material-list.js' %}"></script>
+<script>
+    function showMaterialList() {
+        app.materialListVisible = true;
+        $("#messageModal").modal('hide');
+    }
+</script>
+{% endblock %}

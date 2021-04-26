@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block css_tail %}
+<!-- jqgrid-->
+<link href="{% static 'css/plugins/jqgrid/ui.jqgrid.css' %}" rel="stylesheet">
+<link href="{% static 'css/plugins/datapicker/datepicker3.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<script>
+
+</script>
+<div style="display: none;">
+   <div id="department-data">{{ industry_data }}</div>
+    <div id="fields-to-check">{{ fields_to_check }}</div>
+    <div id="canChangeuser_log">{{ canChange }}</div>
+    <div id="canDeleteuser_log">{{ canDelete }}</div>
+    <div id="user_log-list-api">{{ user_log_list_api }}</div>
+
+</div>
+<div class="row">
+    <div class="col-sm-12">
+        <div style="margin-top: 10px;"></div>
+        <div class="ibox float-e-margins" style="margin-bottom: 5px;">
+            <div class="ibox-content">
+                <form method="GET" onsubmit="return false;" class="form-horizontal" id="user_log-filter-form">
+                    <!-- {% csrf_token %} -->
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <div class="col-lg-2 col-md-3 col-sm-6" style="margin-top: 5px;">
+                                <label>操作人：</label>
+                                <input type="text" class="form-control" placeholder="模糊查询"  name="operator"/>
+                            </div>
+                            <div class="col-lg-2 col-md-3 col-sm-6" style="margin-top: 5px;" id="id_operation_type">
+                                <label>操作类型：</label>
+                                 <!--<select type="text" class="form-control" name="operation_type"></select>-->
+                                {{ form.operation_type }}
+                            </div>
+                            <div class="col-lg-2 col-md-3 col-sm-6" style="margin-top: 5px;">
+                                <label>操作模块：</label>
+                                <input type="text" class="form-control" placeholder="模糊查询"  name="operator_model"/>
+                            </div>
+                            <div class="col-lg-3 col-md-4 col-sm-6" id="data_6" style="margin-top: 5px; padding-left: 1px; padding-right: 1px;">
+                                <label><nobr>操作日期：</nobr></label>
+                                <div class="input-daterange input-group" id="datepicker6">
+                                    <input type="text" class="input-sm form-control" name="operation_time_start" style="width: 110%;"
+                                            value="{% if form.operation_time_start.value %}{{ form.operation_time_start.value }}{% else %}{{ form.operation_time_start.field.value }}{% endif %}" />
+                                    <span class="input-group-addon" style="width: 10%;">&nbsp;&nbsp;&nbsp;&nbsp;至</span>
+                                    <input type="text" class="input-sm form-control" name="operation_time_finish" style="width: 110%;"
+                                            value="{% if form.operation_time_finish.value %}{{ form.operation_time_finish.value }}{% else %}{{ form.operation_time_finish.field.value }}{% endif %}" />
+                                </div>
+                            </div>
+
+
+
+                            <!--<input type="text" id="txt_value" />-->
+                            <!--<input type="text" id="txt_text" /> -->
+                            <div class="col-lg-2 col-md-4 col-sm-6" style="float: right; margin-top: 5px;">
+                                <label></label>
+                                <div>                                        
+                                    <button class="btn btn-primary col-md-6 col-sm-6" type="submit" id="submitBtn">搜索</button>
+                                    <button class="btn btn-white col-md-5 col-sm-4" style="float: right; margin-left: 3px;"type="reset"  id="resetBtn">重置</button>
+                                </div>
+                            </div>
+                            <div style="clear: both;"></div>
+                        </div>
+                        
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="ibox " style="margin-top: 10px;">
+            <div class="ibox-content">
+
+                <div class="jqGrid_wrapper">
+                    <table id="table_list_1"></table>
+                    <div id="pager_list_1"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="init-data" style="display: none;">{{ init_data }}</div>
+
+{% endblock %}
+
+{% block js_tail %}
+    <!-- Peity -->
+    <script src="{% static 'js/plugins/peity/jquery.peity.min.js' %}"></script>
+
+    <!-- jqGrid -->
+    <script src="{% static 'js/plugins/jqgrid/i18n/grid.locale-cn.js' %}"></script>
+    <script src="{% static 'js/plugins/jqgrid/jquery.jqGrid.min.js' %}"></script>
+    
+    <!-- 自定义js -->
+    <script src="{% static 'js/content.js' %}"></script>
+
+    <!-- Chosen -->
+    <script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+
+    <!-- JSKnob -->
+    <script src="{% static 'js/plugins/jsKnob/jquery.knob.js' %}"></script>
+
+    <!-- Input Mask-->
+    <!-- <script src="{% static 'js/plugins/jasny/jasny-bootstrap.min.js' %}"></script> -->
+
+    <!-- Date picker -->
+    <script src="{% static 'js/plugins/datapicker/bootstrap-datepicker.js' %}"></script>
+    <script src="{% static 'js/plugins/ionRangeSlider/ion.rangeSlider.min.js' %}"></script>
+    <!-- <script src="{% static 'js/demo/form-advanced-demo.js' %}"></script> -->
+    <script src="{% static 'js/user_log/user_log_list.js' %}"></script>
+{% endblock %}

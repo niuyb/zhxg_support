@@ -1,0 +1,58 @@
+{% load static %}
+<!--右侧部分开始-->
+    <div class="row border-bottom">
+        <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header"><a class="navbar-minimalize minimalize-styl-2 btn btn-info " href="#"><i class="fa fa-bars"></i> </a>
+                <!-- <form role="search" class="navbar-form-custom" method="post" action="search_results.html">
+                    <div class="form-group">
+                        <input type="text" placeholder="请输入您需要查找的内容 …" class="form-control" name="top-search" id="top-search">
+                    </div>
+                </form> -->
+                <h3 class="navbar-form-custom" style="padding-left: 10px; padding-top: 15px;">{{ title }}</h3 class="navbar-form-custom">
+            </div>
+            <ul class="nav navbar-top-links navbar-right">
+                <li class="dropdown">
+                    <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                        <img alt="image" class="img-circle user-avatar" src="{% if request.user.avatar %}{{ request.user.avatar }}{% else %}{% static 'img/a7.jpg' %}{% endif %}"> 
+                        <span>{% if request.user.username %}{{ request.user.username }}{% else %}<a href="{% url 'user_center:login' %}">登录</a>{% endif %}</span>
+                    </a>
+                    <ul class="dropdown-menu" style="padding: 0; left: 0; right: auto;">
+                        <!-- <li class="m-t-xs">
+                            <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                                <img alt="image" class="img-circle user-avatar-menu" src="{% static 'img/a7.jpg' %}"> <span>设置</span>
+                            </a>
+                        </li> -->
+                        <li class="m-t-xs">
+                            <div class="dropdown-messages-box">
+                                <a href="javascript:;">
+                                    <i class="fa fa-cog"></i><span style="padding-left: 20px;">设置</span>
+                                    <!-- <img alt="image" class="img-circle" src="{% static 'img/a7.jpg' %}"> -->
+                                </a>
+                            </div>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <div class="dropdown-messages-box">
+                                <a href="{% url 'user_center:logout' %}">
+                                    <i class="fa fa-power-off"></i><span style="padding-left: 20px;">登出</span>
+                                    <!-- <img alt="image" class="img-circle" src="{% static 'img/a4.jpg' %}"> -->
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+                            <!-- <img alt="image" class="img-circle user-avatar" src="{% static 'img/restart.jpg' %}"> <span>重启后台</span> -->
+                <!-- {% if request.user.is_superuser %}
+                    <li class="dropdown">
+                        <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                            <i class="fa fa-warning"  style="color:gold"></i><span>重启后台</span>
+                        </a>
+                    </li>
+                {% endif %} -->
+            </ul>
+        </nav>
+    </div>
+    <!-- <div class="row J_mainContent" id="content-main">
+        <iframe id="J_iframe" width="100%" height="100%" src="./index_v1.html" frameborder="0" data-id="index_v1.html" seamless></iframe>
+    </div> -->
+<!--右侧部分结束-->

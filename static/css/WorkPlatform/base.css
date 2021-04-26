@@ -1,0 +1,325 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+button,
+input,
+select,
+textarea {
+  outline: 0;
+  border: 0;
+}
+.flex {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.flex_1 {
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+.flex_2 {
+  -webkit-box-flex: 2;
+  -ms-flex: 2;
+  flex: 2;
+}
+.flex_between {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
+.flex_center {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: distribute;
+  justify-content: space-around;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.flex_verticle {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.flex_v_center {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: distribute;
+  justify-content: space-between;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.flex_column {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+.ellipsis {
+  white-space: nowrap;
+  word-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis
+}
+
+.border_box {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/*列表样式*/
+.task_content_box {
+  max-height: 12rem;
+  overflow: auto;
+}
+.task_title {
+  background:#5cadf0;
+  font-size: .36rem;
+  padding: .1rem .3rem;
+  /* font-weight: normal; */
+}
+.task_list_box {
+  margin: 0 .3rem;
+  padding: .1rem 0;
+  border-bottom: 1px dashed #bcbaba;
+}
+.task_list_box:last-child {
+  border-bottom: none;
+}
+
+.list_title {
+  font-weight: bold;
+  font-size: .3rem;
+}
+/* .list_title, */
+.last_customer,
+.txt_left,
+.txt_right,
+.badtips {
+  font-size: .28rem;
+  line-height: .48rem;
+}
+.txt_right span {
+  display: inline-block;
+  width: 1.8rem;
+}
+.badtips {
+	color: #fa7887;
+}
+.ops_btn_box {
+  font-size: 0;
+  padding-top: .1rem;
+}
+
+.ops_btn_box .btn {
+  display: inline-block;
+  text-transform: none;
+  /* height: .32rem; */
+  padding: .1rem .15rem;
+  font-size: .18rem;
+  border-radius: .04rem;
+  margin: 0 .1rem .1rem 0;  
+  background: #1890ff;
+  color: #fff;
+  border-color: #1890ff;
+  text-shadow: 0 -1px 0 rgba(0,0,0,.12);
+  box-shadow: 0 0.02rem 0 rgba(0,0,0,.045);
+  cursor: pointer;
+}
+
+
+
+/*弹窗样式*/
+
+.dialog_pie {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background: rgba(0, 0, 0, 0.5);
+	z-index: 56;
+	display: none;
+}
+
+.dialog {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background: rgba(0, 0, 0, 0.5);
+	z-index: 56;
+	display: none;
+}
+
+.dialog_container,
+.dialog_container_pie {
+	width: 80%;
+	background: #ffffff;
+	position: fixed;
+	top: 30%;
+	left: 50%;
+	-webkit-transform: translate(-50%, -50%);
+	-ms-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);
+	border-radius: .04rem;
+}
+.dialog_container_pie {
+	top: 50%;
+	padding: .1rem 0;
+	max-height: 4.7rem;
+	overflow: auto;
+}
+.dialog_container_pie .txt_left {
+	width: 64%;
+}
+.dialog_container_pie .txt_left,
+.dialog_container_pie .txt_right {
+	font-size: .22rem;
+}
+
+.dialog_title {
+	color: #333;
+	font-size: .24rem;
+	padding: .06rem .3rem;
+	border-bottom: 1px solid #e3e3e3;
+
+}
+
+.dialog_close,
+.dialog_close_pie {
+	display: inline-block;
+	color: #666;
+	font-size: .4rem;
+	cursor: pointer;
+}
+
+.doalog_content {
+	padding: .1rem .3rem;
+
+}
+.dialog_list {
+	margin-bottom: .12rem;
+}
+.dialog_list_star {
+	color: #ff4800;
+	font-size: .24rem;
+}
+.dialog_list_name {
+	display: inline-block;
+    color: #222;
+	font-size: .2rem;
+    text-align: right;
+    margin-right: .15rem;
+	width: 1rem;
+}
+.dialog_list_name:before {
+	display: inline-block;
+    margin-right: .04rem;
+    color: #f5222d;
+    font-size: .14rem;
+    line-height: 1;
+    content: "*";
+}
+.dialog_list_name.no_star:before {
+	content: "";
+}
+.dialog_list_input,
+.dialog_list_select,
+.business,
+.dialog_list_textarea {
+	display: inline-block;
+	font-size: .22rem;
+	border: 1px solid #d9d9d9;
+	border-radius: .04rem;
+    transition: all .3s;
+	line-height: 1.5;
+	padding: 0.04rem .1rem;
+}
+
+.mian_user,
+.business {
+	width: 1.1rem;
+	margin-right: .04rem;
+}
+.other_user {
+}
+.dialog_list_textarea {
+	height: .8rem;
+	resize: none;
+}
+.desc_box {
+	position: relative;
+}
+.txt_tips {
+	position: absolute;
+	bottom: -.3rem;
+	right: 0;
+	margin-top: .1rem;
+	text-align:right;
+	font-size: .14rem;
+}
+.file_box {
+	position: relative;
+	font-size: 0;
+	margin: .36rem 0 0 1.2rem;
+}
+.file_box span {
+	display: inline-block;
+	background: #eeeeee;
+	padding: .06rem .12rem;
+	font-size: .14rem;
+	border-radius: .04rem;
+	cursor: pointer;
+}
+.dialog_file {
+	position: absolute;
+	left: 0;
+	width: .8rem;
+	height: .3rem;
+	opacity: 0;
+}
+.doalog_btns_box {
+	font-size: 0;
+	padding: .12rem .3rem;
+	text-align:right;
+	box-shadow: 0px -2px 6px #d9d9d9;
+}
+.doalog_btns_box button {
+	padding: .08rem .18rem;
+	border-radius: .04rem;
+	background: #fff;
+	font-size: .16rem;
+	cursor: pointer;
+}
+.doalog_btns_box .cancle_btn {
+	color: rgba(0,0,0,.65);
+	margin-right: .3rem;
+	border: 1px solid #d9d9d9;
+}
+.doalog_btns_box .create_btn {
+	color: #fff;
+	border: 1px solid #1890ff;
+	background: #1890ff;
+}

@@ -1,0 +1,296 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block css_tail %}
+<link href="{% static 'css/plugins/jsmind/style/jsmind.css' %}" rel="stylesheet">
+<style type="text/css">
+    #jsmind_container{
+        width:800px;
+        height:500px;
+        border:solid 1px #ccc;
+        /*background:#f4f4f4;*/
+        /* background:#f4f4f4; */
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<script>
+
+</script>
+<div style="display: none;">
+    <div id="department-api">{{ departments_api }}</div>
+</div>
+<style>
+    .padding-5{
+        padding: 5px 5px;
+    }
+    .mbt-10{
+        margin-bottom: 10px;
+    }
+    .mbt-0{
+        margin-bottom: 0px;
+    }
+    .mr-5{
+        margin-right: 5px;
+    }
+</style>
+<div class="row" style="height: 60%;">
+    <div class="col-sm-3 padding-5">
+        <div class="ibox float-e-margins mbt-0" style="height: 570px;">
+            <div class="ibox-title">
+                <h5 style="width: 100%; text-align: center;">部门信息</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content">
+                <div>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td style="border-top-style: none;">部门：</td>
+                                <td style="border-top-style: none;"><h5><nobr>政务 > 销售中心 > 一大区</nobr></h5></td>
+                            </tr>
+                            <tr>
+                                <td><nobr>负责人：</nobr></td>
+                                <td><a href="#">郭振威</a></td>
+                            </tr>
+                            <tr>
+                                <td><nobr>下属部门：</nobr></td>
+                                <td>
+                                    <a class="mr-5">安徽</a>
+                                    <a class="mr-5">山东</a>
+                                    <a class="mr-5">浙江</a>
+                                    <a>江苏</a>
+                                </td>
+                            </tr>
+                            <!-- <tr>
+                                <td>客户数量：</td>
+                                <td>532个</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>正式客户：213个</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>重点客户：12个</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>新开发客户：30个</td>
+                            </tr>
+                            <tr>
+                                <td>账号数量：</td>
+                                <td>1198个</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>周活跃：320个</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>三个月未活跃：50个</td>
+                            </tr>
+                            <tr>
+                                <td>商机数量：</td>
+                                <td>2341个</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>未创建账号：41个</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>商机停留三个月：41个</td>
+                            </tr> -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="ibox float-e-margins mbt-0" style="height: 280px;">
+            <div class="ibox-title">
+                <h5 style="width: 100%; text-align: center;">工作成果</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content">
+                <div>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td style="border-top-style: none;">销售额：</td>
+                                <td style="border-top-style: none;">1700万元</td>
+                            </tr>
+                            <tr>
+                                <td>客户数量：</td>
+                                <td>532个</td>
+                            </tr>
+                            <tr>
+                                <td>账号数量：</td>
+                                <td>1198个</td>
+                            </tr>
+                            <tr>
+                                <td>订单数量：</td>
+                                <td>320个</td>
+                            </tr>
+                            <tr>
+                                <td>商机数量：</td>
+                                <td>2341个</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div> -->
+    </div>
+    <div class="col-sm-3 padding-5">
+        <div class="ibox float-e-margins mbt-0" style="height: 570px;">
+            <div class="ibox-title">
+                <h5 style="width: 100%; text-align: center;">部门信息</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content" style="width: 100%; height: 92%;">
+                <div>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td style="border-top-style: none;">部门：</td>
+                                <!-- <td style="border-top-style: none;">丛二三<img style="margin-left: 10px;" alt="image" class="img-circle user-avatar" src="/static/img/butterfly.jpg"></td> -->
+                                <td style="border-top-style: none;"><h5><nobr>政务 > 销售中心 > 一大区</nobr></h5></td>
+                            </tr>
+                            <tr>
+                                <td><nobr>负责人：</nobr></td>
+                                <td><a href="#">郭振威</a></td>
+                            </tr>
+                            <tr>
+                                <td><nobr>下属部门：</nobr></td>
+                                <td>
+                                    <a class="mr-5">安徽</a>
+                                    <a class="mr-5">山东</a>
+                                    <a class="mr-5">浙江</a>
+                                    <a>江苏</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="china-map" style="width: 100%; height: 100%;"></div>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="col-sm-3 padding-5">
+        <div class="ibox float-e-margins mbt-10" style="height: 280px;">
+            <div class="ibox-title">
+                <h5 style="width: 100%; text-align: center;">回款情况(年)</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            
+            <div class="ibox-content" style="width: 100%; height: 85%;">
+                <div id="p-r-ms" style="width: 100%; height: 100%;"></div>
+            </div>
+        </div>
+        <div class="ibox float-e-margins mbt-0" style="height: 280px;">
+            <div class="ibox-title">
+                <h5 style="width: 100%; text-align: center;">回款情况(月)</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content" style="width: 100%; height: 85%;">
+                <div id="p-r-ds" style="width: 100%; height: 100%;"></div>
+            </div>
+        </div>
+    </div> -->
+    <div class="col-sm-3 padding-5">
+        <div class="ibox float-e-margins mbt-10" style="height: 280px;">
+            <div class="ibox-title">
+                <h5 style="width: 100%; text-align: center;">客户情况</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content" style="width: 100%; height: 85%;">
+                <div id="about-customer" style="width: 100%; height: 100%;"></div>
+            </div>
+        </div>
+        <div class="ibox float-e-margins mbt-0" style="height: 280px;">
+            <div class="ibox-title">
+                <h5 style="width: 100%; text-align: center;">账号情况</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content" style="width: 100%; height: 85%;">
+                <div id="about-account" style="width: 100%; height: 100%;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="clearfix" style="display: none;"></div>
+</div>
+<div class="row" style="height: 30%; margin-bottom: 30px;">
+    <div class="col-sm-3 padding-5">
+        <div class="ibox float-e-margins mbt-10" style="height: 280px;">
+            <div class="ibox-title">
+                <h5 style="width: 100%; text-align: center;">日常工作</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content" style="width: 100%; height: 85%;">
+                <div id="work-daily" style="width: 100%; height: 100%;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-3 padding-5">
+        <div class="ibox float-e-margins mbt-10" style="height: 280px;">
+            <div class="ibox-title">
+                <h5 style="width: 100%; text-align: center;">部门业绩</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content" style="width: 100%; height: 85%;">
+                <div id="a-dpts" style="width: 100%; height: 100%;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-3 padding-5">
+        <div class="ibox float-e-margins mbt-10" style="height: 280px;">
+            <div class="ibox-title">
+                <h5 style="width: 100%; text-align: center;">客户总量</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content" style="width: 100%; height: 85%;">
+                <div id="customer-count" style="width: 100%; height: 100%;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-3 padding-5">
+        <div class="ibox float-e-margins mbt-10" style="height: 280px;">
+            <div class="ibox-title">
+                <h5 style="width: 100%; text-align: center;">客户行业</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content" style="width: 100%; height: 85%;">
+                <div id="customer-industry" style="width: 100%; height: 100%;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="clearfix" style="display: none;"></div>
+</div>
+<div id="init-data" style="display: none;">{{ init_data }}</div>
+{% endblock %}
+
+{% block js_tail %}
+    <!-- Peity -->
+    <script src="{% static 'js/plugins/peity/jquery.peity.min.js' %}"></script>
+    <script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+
+    <!-- JSKnob -->
+    <script src="{% static 'js/plugins/jsKnob/jquery.knob.js' %}"></script>
+    <script src="{% static 'js/plugins/datapicker/bootstrap-datepicker.js' %}"></script>
+    <script src="{% static 'js/plugins/ionRangeSlider/ion.rangeSlider.min.js' %}"></script>
+    <script src="{% static 'js/plugins/echarts/echarts-all.js' %}"></script>
+    <script src="{% static 'js/plugins/echarts/echarts.min.js' %}"></script>
+    <script src="{% static 'js/plugins/echarts/china.js' %}"></script>
+    <script src="{% static 'js/sale/department-portrait/china-map.js' %}"></script>
+    <script src="{% static 'js/sale/saler-portrait/customer-count.js' %}"></script>
+    <script src="{% static 'js/sale/saler-portrait/work-daily.js' %}"></script>
+    <!-- <script src="{% static 'js/sale/saler-portrait/money-day.js' %}"></script> -->
+    <script src="{% static 'js/sale/saler-portrait/customer-industry.js' %}"></script>
+    <!-- <script src="{% static 'js/sale/department-portrait/p-r-ms.js' %}"></script>
+    <script src="{% static 'js/sale/department-portrait/p-r-ds.js' %}"></script> -->
+    <script src="{% static 'js/sale/department-portrait/a-dpts.js' %}"></script>
+    <script src="{% static 'js/sale/department-portrait/about-customer.js' %}"></script>
+    <script src="{% static 'js/sale/department-portrait/about-account.js' %}"></script>
+{% endblock %}

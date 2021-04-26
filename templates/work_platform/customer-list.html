@@ -1,0 +1,231 @@
+{% extends 'work_platform/base-list.html' %}
+{% load i18n static %}
+
+{% block css_head %}
+
+    <link rel="stylesheet" href="{% static 'css/npm/vant@2.9/lib/index.css' %}" />
+    <link href="{% static 'css/WorkPlatform/list.css' %}?version=1.1.2" rel="stylesheet">
+    <link href="{% static 'css/WorkPlatform/customer-list.css' %}?version=1.1.2" rel="stylesheet">
+{% endblock %}
+
+{% block data_items %}
+    <style>
+        
+        .flex-container-msg {
+                display: -webkit-flex;
+                display: flex;
+                width: 100%;
+                height: 1.6rem;
+                /* background-color: lightgrey; */
+                text-align: center;
+            }
+
+            .flex-item-msg {
+                /* background-color: cornflowerblue; */
+                width: 100%;
+                margin: .10rem;
+            }
+    </style>
+
+    <!-- 展示微信群成员 -->
+    <van-popup v-model="wechatGroupMembers.show" round position="top" :style="{ height: '80%' }">
+      <div v-cloak style="text-align: center;"><h3>微信群成员</h3></div>
+      <van-list
+        v-model="wechatGroupMembers.loading"
+        :finished="wechatGroupMembers.finished"
+        finished-text="">
+        <template
+          v-for="item in wechatGroupMembers.items" >
+          <van-cell 
+            :icon="item.wechat_head_img  || '/static/img/icologo.ico' "
+            :title="item.wechat_group_nick.replace('客服-', '') || item.wechat_nick"
+            :value="item.member_type || '未知'"
+            :label="item.member_name || item.wechat_nick">
+          </van-cell>
+        </template>
+      </van-list>
+    </van-popup>
+
+    <!-- 展示微信群消息的抽屉 -->
+    <van-popup v-model="wechatGroupMessageList.show" round position="top" :style="{ height: '80%' }">
+        <div v-cloak style="text-align: center;"><h3>[[ wechatGroupMessageList.customer && wechatGroupMessageList.customer.accountname ]]</h3></div>
+        <van-pull-refresh 
+            v-model="wechatGroupMessageList.refreshing" 
+            success-text="刷新成功"
+            @refresh="getWechatGroupMessageList">
+            <van-checkbox-group 
+                v-model="wechatGroupMessageList.result">
+                <van-list
+                    v-model="wechatGroupMessageList.loading"
+                    :finished="wechatGroupMessageList.finished"
+                    :finished-text="wechatGroupMessageList.finishedText"
+                    @load="loadWechatGroupMessageList">
+                    <van-cell v-for="item in wechatGroupMessageList.items" :key="item">
+
+                        <div class="flex-container-msg">
+                  
+                            <div v-cloak class="wx-msg-checkbox flex-item-msg" style="display: inline-block; width: 5%;">
+                              <div v-if="wechatGroupMessageList.showCheckBox" style="display: inline-block; position: absolute; top: 2%;">
+                                  <van-checkbox :name="item.id" ref="checkboxes"></van-checkbox>
+                              </div>
+                            </div>
+                            <div v-cloak class="wx-user-avatar flex-item-msg" style="width: 10%; display: inline-block; ">
+                                <img :src="item.wechat_head_img  || '/static/img/icologo.ico' " 
+                                
+                                style="position: absolute; top: 0; width: .64rem; height: .64rem;" />
+                            </div>
+                            <div v-cloak class="wx-msg-body flex-item-msg" style="width: 75%; display: inline-block;">
+                                <div v-cloak class="wx-user-nick" style="font-size: .12rem;">
+                                    <span v-if="item.wechat_nick.indexOf('客服') === 0">[[ item.wechat_nick.split("-")[0] ]]</span>
+                                    <span v-else>[[ item.wechat_nick ]]</span>
+                                    <span style="float: right; font-weight: 900; color: red;">[[ (item.ctime * 1000) | timestampToDatetimeString ]]</span>
+                                    <span style="clear: both;"></span>
+                                </div>
+                                <!-- <div v-cloak class="wx-msg-ctime" style="font-size: .12rem;">
+                                    [[ (item.ctime * 1000) | timestampToDatetimeString ]]
+                                </div> -->
+                                <div v-cloak class="wx-msg-content" style="font-size: .18rem;">
+                                  <template v-if="item.type === 1">
+                                    [[ item.content ]]
+                                  </template>
+                                  <template v-if="item.type === 2">
+                                    <img 
+                                      :src='"data:image/jpg;base64," + [[ item.content ]]'
+                                      style="max-width: 100%; max-height: 10rem;" />
+                                  </template>
+                                  <template v-if="item.type === 3">
+                                    音频：暂时无法展示 ...
+                                  </template>
+                                  <template v-if="item.type === 4">
+                                    视频：暂时无法展示 ...
+                                  </template>
+                                </div>
+                                <div v-if="item.receive_or_send === 0 && item.wechat_nick.indexOf('客服-') === 0" v-cloak class="wx-msg-content" style="font-size: .18rem;">
+                                    推送人：[[ item.wechat_nick.split("-")[1] ]]
+                                </div>
+                            </div>
+                        </div>
+                    </van-cell>
+                </van-cell-group>
+            </van-checkbox-group>
+        </van-pull-refresh>
+    </van-popup>
+    <!-- 绑定微信群的抽屉 -->
+    <van-popup v-model="showBindingForm" round position="bottom" :style="{ height: '50%' }">
+        <div v-cloak style="text-align: center;"><h3>绑定微信群</h3></div>
+        <van-form id="wechatBindingForm" v-show="showBindingForm" @submit="onSubmit">
+            <van-field
+              v-model="wechatBindingForm.customer_id"
+              name="customer_id"
+              label="客户ID"
+              placeholder="客户ID"
+              :rules="[{ required: true, message: '请填写客户ID' }]"
+              :style="{ display: 'none' }"
+            ></van-field>
+            <van-field
+              v-model="wechatBindingForm.customer_name"
+              name="customer_name"
+              label="客户名称"
+              placeholder="客户名称"
+              :rules="[{ required: true, message: '请填写客户名称' }]"
+              readonly="readonly"
+              :style="{ 'font-size': '.24rem', 'line-height': '.80rem', 'height': '.80rem' }"
+              ></van-field>
+            <van-field
+              v-model="wechatBindingForm.wechat_group_name"
+              name="wechat_group_name"
+              label="微信群名称"
+              placeholder="微信群名称"
+              :rules="[{ required: true, message: '请填写微信群名称' }]"
+              readonly="readonly"
+              :style="{ 'font-size': '.24rem', 'line-height': '.80rem', 'height': '.80rem' }"
+              ></van-field>
+            <van-field
+              v-model="wechatBindingForm.robot_name"
+              name="robot_name"
+              label="机器人名称"
+              placeholder="机器人名称"
+              :rules="[{ required: true, message: '机器人名称' }]"
+              readonly="readonly"
+              :style="{ display: 'none' }"
+              ></van-field>
+            <van-field
+                name="qr_code"
+                label="微信群二维码"
+                :rules="[{ required: true, message: '微信群二维码' }]"
+                :style="{ 'font-size': '.24rem', 'line-height': '2rem', 'height': '2rem' }"
+                >
+                <template #input>
+                    <van-uploader preview-size="2rem" v-model="wechatBindingForm.qr_code"></van-uploader>
+                </template>
+            </van-field>
+            <div v-cloak style="margin: .20rem;">
+              <van-button round block type="info" native-type="submit">
+                <span style="font-size: .30rem;">提交</span>
+              </van-button>
+            </div>
+            <div id="form-tip" style="text-align: center; color: red;"></div>
+        </van-form>
+    </van-popup>
+    <van-list
+        v-model="loading"
+        :finished="finished"
+        :finished-text="finishedText"
+        @load="onLoad"
+        >
+        
+        <div v-cloak  v-for="item in list" class="border_box list_box">
+          <div class="border_box list_title ellipsis btom">[[ item.accountname ]]</div>
+          <div class="border_box flex_between btom">
+            <div class="list_left">商务：[[ item.owner_name ]]</div>
+            <div class="list_right flex_1">级别：[[ item.level | levelFormatter ]]</div>
+          </div>
+          <!-- <div class="border_box flex_between btom">
+            <div class="list_left">商机：22个</div>
+            <div class="list_right flex_1">账号：22个</div>
+          </div> -->
+          <div class="border_box flex_between btom">
+            <div class="list_left">微信群：[[ (item.status === 3 ? '申请中' : item.status === 2 ? '绑定失败' : item.status === 1 ? (new Date() - (new Date(item.ctime.replace(/\-/g, '/'))) > 25 * 60 * 60 * 1000 ? '绑定成功' : '审核中') : '未绑定') ]]</div>
+            </div>
+          <div v-if="item.status===1" class="border_box flex_between btom">
+            <div class="list_left">最新消息时间：
+              <span v-if="item.message_ctime" style="color: red;">[[ (item.message_ctime * 1000) | timestampToDatetimeString ]]</span>
+            </div>
+          </div>
+          <div class="border_box list_btn_box">
+            <template v-if="item.status === 1">                
+              <template v-if="item.ctime && (new Date() - (new Date(item.ctime.replace(/\-/g, '/'))) > 25 * 60 * 60 * 1000)">
+                <button @click="confirmUnbindWechatGroup(item)" class="unbind_btn">解绑</button>
+              </template>
+              <template v-else> 
+                <button @click="bindWechatGroup(item)" class="rebind-btn">重绑</button>
+              </template>
+              <button v-if="item.message_ctime" @click="showWechatGroupMessageList(item)" class="unbind_btn" style="background-color: green;">群消息</button>
+              <button v-else @click="showWechatGroupMessageList(item)" class="unbind_btn" style="background-color: gray;">群消息</button>
+              <div v-if="!(item.is_read) && item.message_ctime" style="display: inline-block; width: .1rem; height: .1rem; position: relative; top: -.3rem; left: -.3rem; background-color: red; border-radius: .05rem;"></div>
+              <!-- <button class="unbind_btn" style="background-color: white;">
+                <van-icon :dot="!(item.is_read)" name="/static/img/wechat48.png" size=".60rem" @click="showWechatGroupMessageList(item)"></van-icon>
+              </button> -->
+              <button @click="showWechatGroupMembers(item)" class="bind_btn">群成员</button>
+            </template>
+            <template v-else-if="item.status === 3 || item.status === 2">
+              <button @click="bindWechatGroup(item)" class="rebind-btn">重绑</button>
+            </template>
+            <template v-else>
+              <button @click="bindWechatGroup(item)" class="bind_btn">绑定</button>
+            </template>
+          </div>
+          <div class="border_box"></div>
+          <div class="border_box"></div>
+          <div class="border_box"></div>
+        </div>
+
+    </van-list>
+{% endblock %}
+
+{% block js_tail %}
+<script src="{% static 'js/work_platform/base/list-mixin.js' %}?version=1.1.2"></script>
+<script src="{% static 'js/work_platform/base/sidebar-mixin.js' %}?version=1.1.2"></script>
+<script src="{% static 'js/work_platform/customer/customerListMixin.js' %}?version=1.1.2"></script>
+<script src="{% static 'js/work_platform/customer/list.js' %}?version=1.1.2"></script>
+{% endblock %}

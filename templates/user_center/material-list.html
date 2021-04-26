@@ -1,0 +1,327 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block css_tail %}
+<!-- <link rel="stylesheet" href="https://unpkg.com/vue-easytable/umd/css/index.css">
+<link rel="stylesheet" href="https://unpkg.com/element-ui@2.13.1/lib/theme-chalk/index.css"> -->
+
+<link rel="stylesheet" href="{% static 'css/element-ui@2.13.1/lib/theme-chalk/index.css' %}">
+<link rel="stylesheet" href="{% static 'css/xman/switch.css' %}">
+
+<!-- <link rel="stylesheet" href="{% static 'css/plugins/vue-easytable/umd/css/index.css' %}">
+<link rel="stylesheet" href="{% static 'css/plugins/vue-easytable/umd/css/v-checkbox-group.css' %}">
+<link rel="stylesheet" href="{% static 'css/plugins/vue-easytable/umd/css/v-search.css' %}"> -->
+{% endblock %}
+
+{% block body %}
+<!-- <script src="{% static 'js/plugins/echarts/echarts-all.js' %}"></script>
+<script src="{% static 'js/plugins/echarts/echarts.min.js' %}"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
+
+<script src="{% static 'js/npm/vue@2.6.11' %}"></script>
+<script src="{% static 'js/axios/dist/axios.min.js' %}"></script>
+<script src="{% static 'js/plugins/qs/qs.min.js' %}"></script>
+<!-- <script src="{% static 'js/plugins/vue-easytable/easytable.js' %}"></script> -->
+<!-- <script src="https://unpkg.com/vue-easytable/umd/js/index.js"></script> -->
+<!-- <script src="https://unpkg.com/element-ui@2.13.1/lib/index.js"></script> -->
+<script src="{% static 'js/element-ui@2.13.1/lib/index.js' %}"></script>
+
+<style>
+    .padding-5{
+        padding: 0px 0px;
+    }
+    .mbt-10{
+        margin-bottom: 10px;
+    }
+    .mbt-0{
+        margin-bottom: 0px;
+    }
+    .mr-5{
+        margin-right: 5px;
+    }
+    .mt-10{
+        margin-top: 10px;
+    }
+    .footer-cell-class-name-title{
+        background-color: #f60;
+        color: #fff;
+    }
+    .footer-cell-class-name-normal{
+        color: red;
+    }
+    [v-cloak]{
+        display: none;
+    }
+</style>
+<div class="row">
+    <div class="col-md-12 padding-5" style="width: 100%; height: 100%;">
+        <div class="ibox">
+            <div class="ibox-title" style="padding-top: 8px;">    
+                <div id="button-group" v-cloak>
+                    <el-button-group>
+                        <el-button @click="refresh" type="primary" icon="el-icon-refresh" :loading="refreshing" class="el-button--mini">
+                            刷新
+                        </el-button>
+                        <el-button @click="multipleDelete" type="danger" icon="el-icon-delete" :loading="deleting" class="el-button--mini">
+                            删除
+                        </el-button>
+                        <el-button @click="create" type="success" icon="el-icon-plus" class="el-button--mini">
+                            新建
+                        </el-button>
+                        <!-- <el-button @click="multipleAccess" type="warning" icon="el-icon-lock" class="el-button--mini">
+                            授权
+                        </el-button> -->
+                        <!-- <el-button @click="create" type="primary" icon="el-icon-plus" class="el-button--mini">
+                            启用
+                        </el-button>
+                        <el-button @click="create" type="primary" icon="el-icon-plus" class="el-button--mini">
+                            禁用
+                        </el-button> -->
+                    </el-button-group>
+                </div>
+            </div>
+            <div class="ibox-content">
+                {% csrf_token %}
+                <div v-cloak id="app"> 
+                    <el-dialog title="上传资料" center :visible.sync="materialUploadFormVisible" v-loading="materialUploading">  
+                      <el-progress 
+                        v-if="materialUploading"
+                        style="z-index: 100000;"
+                        :text-inside="true" 
+                        :stroke-width="18" 
+                        :percentage="Math.ceil(materialUploadPercent)">
+                      </el-progress>
+                      <el-form :model="materialUploadForm" enctype="multipart/form-data" name="materialUploadForm">
+                        <el-form-item label="资料标题" :label-width="formLabelWidth">
+                          <el-input v-model="materialUploadForm.title" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="资料类型" :label-width="formLabelWidth">
+                          <el-select v-model="materialUploadForm.typ" placeholder="请选择资料类型">
+                            <el-option label="----" value="0"></el-option>
+                            <el-option label="视频" value="1"></el-option>
+                            <el-option label="音频" value="2"></el-option>
+                            <el-option label="文件" value="3"></el-option>
+                            <el-option label="图片" value="4"></el-option>
+                          </el-select>
+                        </el-form-item>
+                        <el-form-item label="资料" :label-width="formLabelWidth">
+                            <div v-cloak >
+                                <input type="file" v-model="materialUploadForm.file" name="file" />
+                            </div>
+                            
+                            <!-- <el-upload
+                                v-model="materialUploadForm.file"
+                                class="upload-demo"
+                                drag
+                                ref="upload"
+                                name="file"
+                                :data="materialUploader.data"
+                                :file-list="materialUploader.fileList"
+                                :on-error="uploadFail"
+                                :on-success="uploadSuccess"
+                                :auto-upload="false"
+                                :before-upload="beforeMaterialUpload"
+                                :action="materialUploader.action"
+                                :multiple="false">
+                                <i class="el-icon-upload"></i>
+                                <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+                                <div class="el-upload__tip" slot="tip">上传视频、音频、文件、图片等</div>
+                            </el-upload> -->
+                        </el-form-item>
+                        <el-form-item label="资料描述" :label-width="formLabelWidth">
+                          <el-input v-model="materialUploadForm.comment" autocomplete="off"></el-input>
+                        </el-form-item>
+                      </el-form>
+                      <div v-cloak slot="footer" class="dialog-footer">
+                        <el-button @click="materialUploadFormVisible = false">取 消</el-button>
+                        <el-button type="primary" @click="uploadFile">确 定</el-button>
+                      </div>
+                    </el-dialog>            
+                    
+                    <el-dialog title="修改资料" center :visible.sync="materialChangeFormVisible">
+                      <el-form :model="materialChangeForm" name="materialChangeForm">
+                        <el-form-item label="资料名称" :label-width="formLabelWidth">
+                          <el-input v-model="materialChangeForm.name" autocomplete="off" readonly="readonly"></el-input>
+                        </el-form-item>
+                        <el-form-item label="资料类型" :label-width="formLabelWidth">
+                          <el-select name="typ" v-model="materialChangeForm.typ" placeholder="请选择资料类型">
+                            <el-option label="----" value="0"></el-option>
+                            <el-option label="视频" value="1"></el-option>
+                            <el-option label="音频" value="2"></el-option>
+                            <el-option label="文件" value="3"></el-option>
+                            <el-option label="图片" value="4"></el-option>
+                          </el-select>
+                        </el-form-item>
+                        <el-form-item label="链接" :label-width="formLabelWidth">
+                          <el-input v-model="materialChangeForm.url" autocomplete="off" readonly="readonly"></el-input>
+                        </el-form-item>
+                        <el-form-item label="资料标题" :label-width="formLabelWidth">
+                          <el-input v-model="materialChangeForm.title" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="资料描述" :label-width="formLabelWidth">
+                          <el-input v-model="materialChangeForm.comment" autocomplete="off"></el-input>
+                        </el-form-item>
+                        <el-form-item label="上传人" :label-width="formLabelWidth">
+                          <el-input v-model="materialChangeForm.username" autocomplete="off" readonly="readonly"></el-input>
+                        </el-form-item>
+                        <el-form-item label="上传日期" :label-width="formLabelWidth">
+                          <el-input v-model="materialChangeForm.created_at" autocomplete="off" readonly="readonly"></el-input>
+                        </el-form-item>
+                      </el-form>
+                      <div v-cloak slot="footer" class="dialog-footer">
+                        <el-button @click="materialChangeFormVisible = false">取 消</el-button>
+                        <el-button type="primary" @click="editFile">确 定</el-button>
+                      </div>
+                    </el-dialog>                 
+                    
+                    <el-table
+                        ref="multipleTable"
+                        :data="tableData"
+                        row-key="id"
+                        tooltip-effect="dark"
+                        style="width: 100%; margin-bottom: 20px;"
+                        border
+                        fit
+                        @selection-change="handleSelectionChange">
+                        <el-table-column
+                          type="selection"
+                          prop="id"
+                          width="55">
+                        </el-table-column>
+                        <el-table-column
+                          label="名称"
+                          prop="name"
+                          width="100">
+                        </el-table-column>
+                        <el-table-column
+                          label="类型"
+                          prop="typ"
+                          width="50">
+                          <template slot-scope="scope">
+                              <span>[[ {0: '----', 1: '视频', 2: '音频', 3: '文件', 4: '图片'}[scope.row.typ] ]]</span>
+                          </template>
+                        </el-table-column>
+                        <el-table-column
+                          label="路径"
+                          prop="path"
+                          width="200">
+                        </el-table-column>
+                        <el-table-column
+                            label="播放地址"
+                            prop="url"
+                            width="200">
+                            <template slot-scope="scope">
+                                <el-link 
+                                    type="primary" 
+                                    :href="scope.row.url"
+                                    target="_blank">
+                                    [[ scope.row.url ]]
+                                </el-link>
+                            </template>
+                        </el-table-column>
+                        <el-table-column
+                          prop="title"
+                          label="标题"
+                          width="200">
+                        </el-table-column>
+                        <el-table-column
+                          prop="comment"
+                          label="描述"
+                          width="300">
+                        </el-table-column>
+                        <!-- <el-table-column
+                          prop="status"
+                          label="状态"
+                          width="120">
+                          <template slot-scope="scope">
+                            <el-switch 
+                                @change="changeStatus(scope.$index, scope.row)" 
+                                v-model="scope.row.status" 
+                                active-color="#00A854"
+                                active-text="启用"
+                                inactive-text="禁用">
+                            </el-switch>
+                          </template>
+                        </el-table-column> -->
+                        <el-table-column
+                          prop="username"
+                          label="上传人"
+                          width="80">
+                        </el-table-column>
+                        <el-table-column
+                          label="上传时间"
+                          prop="created_at"
+                          width="160">
+                        </el-table-column>
+                        <el-table-column
+                            prop="operation"
+                            label="操作"
+                            width="200">
+                            <template slot="header" slot-scope="scope">
+                                <el-input
+                                    v-model="search"
+                                    size="mini"
+                                    placeholder="输入关键字搜索"/>
+                          </template>
+                          <template slot-scope="scope">
+                            <el-button-group>
+                                <el-button
+                                  size="mini"
+                                  type="primary"
+                                  @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                                <!-- <el-popover
+                                    width="600"
+                                    @show="showUsers(scope.$index, scope.row)"
+                                    placement="bottom-end"
+                                    trigger="click">
+                                    <div v-if="users.length > 0"><a v-for="user in users" :href="'/xman/user/detail?id=' + user.id" style="width: 19%;">[[ user.username ]]&nbsp;&nbsp;&nbsp;&nbsp;</a></div>
+                                    <div v-else>[[ userTooltip ]]</div>
+                                    <el-button
+                                        id="accessButton" 
+                                        slot="reference"
+                                        size="mini"
+                                        type="warning"
+                                        >
+                                        人员
+                                    </el-button>
+                                </el-popover> -->
+                                <el-button
+                                  size="mini"
+                                  type="danger"
+                                  @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                              </el-button-group>
+                          </template>
+                        </el-table-column>
+                    </el-table>
+                    <el-pagination
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                        :current-page="currentPage"
+                        :page-sizes="pageSizes"
+                        :page-size="pageSize"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="totalNum">
+                    </el-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="clearfix" style="display: none;"></div>
+</div>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+{% block js_tail %}
+    <!-- Peity -->
+    <script src="{% static 'js/plugins/peity/jquery.peity.min.js' %}"></script>
+    <script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+
+    <!-- JSKnob -->
+    <script src="{% static 'js/plugins/jsKnob/jquery.knob.js' %}"></script>
+    <script src="{% static 'js/plugins/datapicker/bootstrap-datepicker.js' %}"></script>
+    <script src="{% static 'js/plugins/ionRangeSlider/ion.rangeSlider.min.js' %}"></script>
+    <script src="{% static 'js/user_center/material-list.js' %}"></script>
+{% endblock %}

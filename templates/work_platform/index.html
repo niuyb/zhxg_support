@@ -1,0 +1,103 @@
+{% extends 'work_platform/base.html' %}
+{% load i18n static %}
+
+{% block css_head %}
+
+<link rel="stylesheet" href="{% static 'css/npm/vant@2.9/lib/index.css' %}" />
+<link href="{% static 'css/WorkPlatform/list.css' %}?version=1.1.1" rel="stylesheet">
+
+{% endblock %}
+
+{% block js_head %}
+    <script src="{% static 'js/npm/vue/dist/vue.min.js' %}"></script>
+    <script src="{% static 'js/axios/dist/axios.min.js' %}"></script>
+    <script src="{% static 'js/npm/vant@2.9/lib/vant.min.js' %}"></script>
+{% endblock %}
+
+{% block body %}
+    <style>
+        .title{
+            margin-left: -.16rem;
+        }
+        .flex-container{
+            padding-top: .20rem;
+        }
+        .flex-item img{
+            width: .64rem;
+            height: .64rem;
+        }
+        #sidebar-btn{
+            margin-top: .14rem;
+            margin-right: .30rem;
+        }
+        #top-opts{
+            margin-top: .14rem;
+        }
+    </style>
+    <div class="title">
+        <!-- <div id="sidebar-btn"><img  onclick="messager.error('开发中！');" src="/static/img/hamburg64.png" /></div> -->
+        <div id="sidebar-btn" style="margin-top: .16rem;"><img  @click="toSidebar" src="/static/img/hamburg64.png" /></div>
+        <div id="top-opts"><span>{{ title }}</span></div>
+        <div id="tools">
+            <span id="search">
+                <img onclick="messager.error('开发中！');" src="/static/img/search64-white.png" />
+            </span>
+        </div>
+        <div style="display: none; clear: both;"></div>
+    </div>
+    
+    <div id="apps">
+        <div class="flex-container">
+            <div class="flex-item">
+                <div>
+                    <a href="/work_platform/customer/list">
+                        <img style="width: 1.28rem; height: 1.28rem;" src="/static/img/customer128.png" />
+                    </a>
+                </div>
+                <div class="app-name" style="font-size: .26rem;">客户</div>
+            </div>
+            <div class="flex-item">
+                <div>                    
+                    <a href="/work_platform/task">
+                        <img style="width: 1.28rem; height: 1.28rem;" src="/static/img/task128.png" />
+                    </a>
+                </div>
+                <div class="app-name" style="font-size: .26rem;">任务</div>
+            </div>
+            <div class="flex-item">
+                <div>                    
+                    <a href="/work_platform/customer/list?sortBy=%7B%22createdat%22:%22desc%22%7D&filterBy=%7B%22level%22:[],%22wechat_group%22:[3,2],%22is_read%22:[]%7D&page=1&pageSize=20">
+                        <img style="width: 1.28rem; height: 1.28rem;" src="/static/img/wechat128.png" />
+                    </a>
+                </div>
+                <div class="app-name" style="font-size: .26rem;">微信群</div>
+            </div>
+            
+        </div>
+
+
+        <div class="flex-container">
+                <div class="flex-item" style="margin-top: 1rem;">
+                    <div>
+                        <a href="/work_platform/count">
+                            <img style="width: 1.28rem; height: 1.28rem;" src="/static/img/task128.png" />
+                        </a>
+                    </div>
+                    <div class="app-name" style="font-size: .26rem;">商务管理</div>
+                </div>
+                <div class="flex-item" style="margin-top: 1rem;">
+
+                </div>
+                <div class="flex-item" style="margin-top: 1rem;">
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js_tail %}
+
+<script src="{% static 'js/work_platform/base/sidebar-mixin.js' %}?version=1.0.5"></script>
+<script src="{% static 'js/work_platform/index.js' %}?version=1.0.8"></script>
+{% endblock %}
